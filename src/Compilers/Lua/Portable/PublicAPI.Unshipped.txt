@@ -1,1 +1,18 @@
 #nullable enable
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.ColonToken.get -> Loretta.CodeAnalysis.SyntaxToken
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.Identifier.get -> Loretta.CodeAnalysis.SyntaxToken
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.Type.get -> Loretta.CodeAnalysis.Lua.Syntax.TypeSyntax!
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.Update(Loretta.CodeAnalysis.SyntaxToken identifier, Loretta.CodeAnalysis.SyntaxToken colonToken, Loretta.CodeAnalysis.Lua.Syntax.TypeSyntax! type) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.WithColonToken(Loretta.CodeAnalysis.SyntaxToken colonToken) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.WithIdentifier(Loretta.CodeAnalysis.SyntaxToken identifier) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.WithType(Loretta.CodeAnalysis.Lua.Syntax.TypeSyntax! type) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+Loretta.CodeAnalysis.Lua.SyntaxKind.NamedType = 2113 -> Loretta.CodeAnalysis.Lua.SyntaxKind
+override Loretta.CodeAnalysis.Lua.LuaSyntaxRewriter.VisitNamedType(Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax! node) -> Loretta.CodeAnalysis.SyntaxNode?
+override Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.Accept(Loretta.CodeAnalysis.Lua.LuaSyntaxVisitor! visitor) -> void
+override Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax.Accept<TResult>(Loretta.CodeAnalysis.Lua.LuaSyntaxVisitor<TResult>! visitor) -> TResult?
+static Loretta.CodeAnalysis.Lua.SyntaxFactory.NamedType(Loretta.CodeAnalysis.SyntaxToken identifier, Loretta.CodeAnalysis.Lua.Syntax.TypeSyntax! type) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+static Loretta.CodeAnalysis.Lua.SyntaxFactory.NamedType(Loretta.CodeAnalysis.SyntaxToken identifier, Loretta.CodeAnalysis.SyntaxToken colonToken, Loretta.CodeAnalysis.Lua.Syntax.TypeSyntax! type) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+static Loretta.CodeAnalysis.Lua.SyntaxFactory.NamedType(string! identifier, Loretta.CodeAnalysis.Lua.Syntax.TypeSyntax! type) -> Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax!
+virtual Loretta.CodeAnalysis.Lua.LuaSyntaxVisitor.VisitNamedType(Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax! node) -> void
+virtual Loretta.CodeAnalysis.Lua.LuaSyntaxVisitor<TResult>.VisitNamedType(Loretta.CodeAnalysis.Lua.Syntax.NamedTypeSyntax! node) -> TResult?

@@ -22,6 +22,15 @@
             {
                 return ParseTypeStartingWithParenthesis(TypePackType.Some);
             }
+            else if (CurrentToken.Kind is SyntaxKind.DotDotDotToken)
+            {
+                return ParseVariadicTypeParameterValue();
+            }
+            else if (CurrentToken.Kind is SyntaxKind.IdentifierToken
+                     && PeekToken(1).Kind is SyntaxKind.DotDotDotToken)
+            {
+                return ParseVariadicTypeParameterValue();
+            }
             else
             {
                 return ParseType();
@@ -106,7 +115,7 @@
             {
                 // function or parenthesized
                 SyntaxKind.OpenParenthesisToken
-                or SyntaxKind.LessThanToken =>
+                    or SyntaxKind.LessThanToken =>
                     ParseTypeStartingWithParenthesis(TypePackType.None),
                 // table
                 SyntaxKind.OpenBraceToken =>
@@ -257,7 +266,7 @@
                     type);
             }
             else if (CurrentToken.Kind is SyntaxKind.IdentifierToken
-                && PeekToken(1).Kind is SyntaxKind.DotDotDotToken)
+                     && PeekToken(1).Kind is SyntaxKind.DotDotDotToken)
             {
                 var identifier = EatTokenWithPrejudice(SyntaxKind.IdentifierToken);
                 var dotDotDotToken = EatTokenWithPrejudice(SyntaxKind.DotDotDotToken);
@@ -308,6 +317,8 @@
             var openParenthesisToken = EatToken(SyntaxKind.OpenParenthesisToken);
             var typesListBuilder = _pool.AllocateSeparated<TypeSyntax>();
 
+            var encounteredNamedType = false;
+
             while (CurrentToken.Kind is not (SyntaxKind.CloseParenthesisToken or SyntaxKind.EndOfFileToken))
             {
                 if (CurrentToken.Kind is SyntaxKind.DotDotDotToken)
@@ -320,6 +331,20 @@
 
                     typesListBuilder.Add(variadicType);
                     break;
+                }
+                if (CurrentToken.Kind is SyntaxKind.IdentifierToken &&
+                    PeekToken(1).Kind is SyntaxKind.ColonToken)
+                {
+                    var identifier = EatToken(SyntaxKind.IdentifierToken);
+                    var colonToken = EatToken(SyntaxKind.ColonToken);
+                    var type = ParseType();
+
+                    var namedType = SyntaxFactory.NamedType(
+                        identifier,
+                        colonToken,
+                        type);
+                    typesListBuilder.Add(namedType);
+                    encounteredNamedType = true;
                 }
                 else
                 {
@@ -341,14 +366,16 @@
             var typesList = _pool.ToListAndFree(typesListBuilder);
             var closeParenthesisToken = EatToken(SyntaxKind.CloseParenthesisToken);
 
-            if (typePackType == TypePackType.Only)
+            if (typePackType == TypePackType.Only && !encounteredNamedType)
                 goto pack;
 
             if (typeParameterList is not null
                 || CurrentToken.Kind == SyntaxKind.MinusGreaterThanToken
                 // If there's not an arrow, then we need to error if there's more than
                 // one type in the list and we aren't allowed to accept packs
-                || (typesList.Count != 1 && typePackType == TypePackType.None))
+                || (typesList.Count != 1 && typePackType == TypePackType.None)
+                // Only functions can have named types
+                || encounteredNamedType)
             {
                 var slimArrow = EatToken(SyntaxKind.MinusGreaterThanToken);
                 var returnType = ParseReturnType();

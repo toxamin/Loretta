@@ -754,8 +754,10 @@ namespace Loretta.CodeAnalysis.Lua
         GenericTypePack = 2110,
         //     Type binding
         TypeBinding = 2111,
+        
+        NamedType = 2113, // FloorDivideExpression = 2112
 
-        // Big gap 2112-3000 (insert new nodes here)
+        // Big gap 2114-3000 (insert new nodes here)
 
         // Other types of nodes
         CompilationUnit = 3001,

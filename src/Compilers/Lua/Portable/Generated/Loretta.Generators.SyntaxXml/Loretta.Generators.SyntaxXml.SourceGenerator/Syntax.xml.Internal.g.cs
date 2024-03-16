@@ -8814,6 +8814,114 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         }
     }
 
+    /// <summary>This node represents a named type.</summary>
+    internal sealed partial class NamedTypeSyntax : TypeSyntax
+    {
+        internal readonly SyntaxToken identifier;
+        internal readonly SyntaxToken colonToken;
+        internal readonly TypeSyntax type;
+
+        internal NamedTypeSyntax(SyntaxKind kind, SyntaxToken identifier, SyntaxToken colonToken, TypeSyntax type, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+          : base(kind, diagnostics, annotations)
+        {
+            this.SlotCount = 3;
+            this.AdjustFlagsAndWidth(identifier);
+            this.identifier = identifier;
+            this.AdjustFlagsAndWidth(colonToken);
+            this.colonToken = colonToken;
+            this.AdjustFlagsAndWidth(type);
+            this.type = type;
+        }
+
+        internal NamedTypeSyntax(SyntaxKind kind, SyntaxToken identifier, SyntaxToken colonToken, TypeSyntax type)
+          : base(kind)
+        {
+            this.SlotCount = 3;
+            this.AdjustFlagsAndWidth(identifier);
+            this.identifier = identifier;
+            this.AdjustFlagsAndWidth(colonToken);
+            this.colonToken = colonToken;
+            this.AdjustFlagsAndWidth(type);
+            this.type = type;
+        }
+
+        /// <summary>
+        /// The identifier.
+        /// </summary>
+        public SyntaxToken Identifier => this.identifier;
+        /// <summary>
+        /// Gets the <c>:</c> token.
+        /// </summary>
+        public SyntaxToken ColonToken => this.colonToken;
+        /// <summary>Gets the type associated with this type.</summary>
+        public TypeSyntax Type => this.type;
+
+        internal override GreenNode? GetSlot(int index)
+            => index switch
+            {
+                0 => this.identifier,
+                1 => this.colonToken,
+                2 => this.type,
+                _ => null,
+            };
+
+        internal override SyntaxNode CreateRed(SyntaxNode? parent, int position) => new Lua.Syntax.NamedTypeSyntax(this, parent, position);
+
+        public override void Accept(LuaSyntaxVisitor visitor) => visitor.VisitNamedType(this);
+        public override TResult Accept<TResult>(LuaSyntaxVisitor<TResult> visitor) => visitor.VisitNamedType(this);
+
+        public NamedTypeSyntax Update(SyntaxToken identifier, SyntaxToken colonToken, TypeSyntax type)
+        {
+            if (identifier != this.Identifier || colonToken != this.ColonToken || type != this.Type)
+            {
+                var newNode = SyntaxFactory.NamedType(identifier, colonToken, type);
+                var diags = GetDiagnostics();
+                if (diags?.Length > 0)
+                    newNode = newNode.WithDiagnosticsGreen(diags);
+                var annotations = GetAnnotations();
+                if (annotations?.Length > 0)
+                    newNode = newNode.WithAnnotationsGreen(annotations);
+                return newNode;
+            }
+
+            return this;
+        }
+
+        internal override GreenNode SetDiagnostics(DiagnosticInfo[]? diagnostics)
+            => new NamedTypeSyntax(this.Kind, this.identifier, this.colonToken, this.type, diagnostics, GetAnnotations());
+
+        internal override GreenNode SetAnnotations(SyntaxAnnotation[]? annotations)
+            => new NamedTypeSyntax(this.Kind, this.identifier, this.colonToken, this.type, GetDiagnostics(), annotations);
+
+        internal NamedTypeSyntax(ObjectReader reader)
+          : base(reader)
+        {
+            this.SlotCount = 3;
+            var identifier = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(identifier);
+            this.identifier = identifier;
+            var colonToken = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(colonToken);
+            this.colonToken = colonToken;
+            var type = (TypeSyntax)reader.ReadValue();
+            AdjustFlagsAndWidth(type);
+            this.type = type;
+        }
+
+        internal override void WriteTo(ObjectWriter writer)
+        {
+            base.WriteTo(writer);
+            writer.WriteValue(this.identifier);
+            writer.WriteValue(this.colonToken);
+            writer.WriteValue(this.type);
+        }
+
+        static NamedTypeSyntax()
+        {
+            ObjectBinder.RegisterTypeReader(typeof(NamedTypeSyntax), r => new NamedTypeSyntax(r));
+        }
+    }
+
     /// <summary>This node represents a generic type pack.</summary>
     internal sealed partial class GenericTypePackSyntax : TypeSyntax
     {
@@ -9076,6 +9184,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         public virtual TResult VisitLiteralType(LiteralTypeSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitTypeofType(TypeofTypeSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitVariadicTypePack(VariadicTypePackSyntax node) => this.DefaultVisit(node);
+        public virtual TResult VisitNamedType(NamedTypeSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitGenericTypePack(GenericTypePackSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitCompilationUnit(CompilationUnitSyntax node) => this.DefaultVisit(node);
     }
@@ -9156,6 +9265,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         public virtual void VisitLiteralType(LiteralTypeSyntax node) => this.DefaultVisit(node);
         public virtual void VisitTypeofType(TypeofTypeSyntax node) => this.DefaultVisit(node);
         public virtual void VisitVariadicTypePack(VariadicTypePackSyntax node) => this.DefaultVisit(node);
+        public virtual void VisitNamedType(NamedTypeSyntax node) => this.DefaultVisit(node);
         public virtual void VisitGenericTypePack(GenericTypePackSyntax node) => this.DefaultVisit(node);
         public virtual void VisitCompilationUnit(CompilationUnitSyntax node) => this.DefaultVisit(node);
     }
@@ -9383,6 +9493,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
         public override LuaSyntaxNode VisitVariadicTypePack(VariadicTypePackSyntax node)
             => node.Update((SyntaxToken)Visit(node.DotDotDotToken), (TypeSyntax)Visit(node.Type));
+
+        public override LuaSyntaxNode VisitNamedType(NamedTypeSyntax node)
+            => node.Update((SyntaxToken)Visit(node.Identifier), (SyntaxToken)Visit(node.ColonToken), (TypeSyntax)Visit(node.Type));
 
         public override LuaSyntaxNode VisitGenericTypePack(GenericTypePackSyntax node)
             => node.Update((SyntaxToken)Visit(node.Identifier), (SyntaxToken)Visit(node.DotDotDotToken));
@@ -11118,6 +11231,29 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             return result;
         }
 
+        public static NamedTypeSyntax NamedType(SyntaxToken identifier, SyntaxToken colonToken, TypeSyntax type)
+        {
+#if DEBUG
+            if (identifier == null) throw new ArgumentNullException(nameof(identifier));
+            if (identifier.Kind != SyntaxKind.IdentifierToken) throw new ArgumentException($"Invalid kind provided. Expected IdentifierToken but got {identifier.Kind}.", nameof(identifier));
+            if (colonToken == null) throw new ArgumentNullException(nameof(colonToken));
+            if (colonToken.Kind != SyntaxKind.ColonToken) throw new ArgumentException($"Invalid kind provided. Expected ColonToken but got {colonToken.Kind}.", nameof(colonToken));
+            if (type == null) throw new ArgumentNullException(nameof(type));
+#endif
+
+            int hash;
+            var cached = SyntaxNodeCache.TryGetNode((int)SyntaxKind.NamedType, identifier, colonToken, type, out hash);
+            if (cached != null) return (NamedTypeSyntax)cached;
+
+            var result = new NamedTypeSyntax(SyntaxKind.NamedType, identifier, colonToken, type);
+            if (hash >= 0)
+            {
+                SyntaxNodeCache.AddNode(result, hash);
+            }
+
+            return result;
+        }
+
         public static GenericTypePackSyntax GenericTypePack(SyntaxToken identifier, SyntaxToken dotDotDotToken)
         {
 #if DEBUG
@@ -11238,6 +11374,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 typeof(LiteralTypeSyntax),
                 typeof(TypeofTypeSyntax),
                 typeof(VariadicTypePackSyntax),
+                typeof(NamedTypeSyntax),
                 typeof(GenericTypePackSyntax),
                 typeof(CompilationUnitSyntax),
             };

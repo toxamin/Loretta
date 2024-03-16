@@ -2539,6 +2539,39 @@
         </Field>
     </Node>
 
+    <Node Name="NamedTypeSyntax" Base="TypeSyntax">
+        <TypeComment>
+            <summary>This node represents a named type.</summary>
+        </TypeComment>
+        <FactoryComment>
+            <summary>
+                Creates a new <see cref="NamedTypeSyntax" /> node.
+            </summary>
+        </FactoryComment>
+        <Kind Name="NamedType" />
+        <Field Name="Identifier" Type="SyntaxToken">
+            <PropertyComment>
+                <summary>
+                    The identifier.
+                </summary>
+            </PropertyComment>
+            <Kind Name="IdentifierToken" />
+        </Field>
+        <Field Name="ColonToken" Type="SyntaxToken">
+            <PropertyComment>
+                <summary>
+                    Gets the <c>:</c> token.
+                </summary>
+            </PropertyComment>
+            <Kind Name="ColonToken" />
+        </Field>
+        <Field Name="Type" Type="TypeSyntax">
+            <PropertyComment>
+                <summary>Gets the type associated with this type.</summary>
+            </PropertyComment>
+        </Field>
+    </Node>
+
     <Node Name="GenericTypePackSyntax" Base="TypeSyntax">
         <TypeComment>
             <summary>This node represents a generic type pack.</summary>

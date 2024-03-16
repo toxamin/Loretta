@@ -1355,5 +1355,131 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Parsing
             }
             EOF();
         }
+        
+        [Fact]
+        public void Parser_ParseVariadicPackReturn()
+        {
+            UsingStatement("type T = ((Player, ...any) -> ...any)?");
+
+            N(SyntaxKind.TypeDeclarationStatement);
+            {
+                N(SyntaxKind.TypeKeyword);
+                N(SyntaxKind.IdentifierToken, "T");
+                N(SyntaxKind.EqualsToken);
+                N(SyntaxKind.NilableType);
+                {
+                    N(SyntaxKind.ParenthesizedType);
+                    {
+                        N(SyntaxKind.OpenParenthesisToken);
+                        N(SyntaxKind.FunctionType);
+                        {
+                            N(SyntaxKind.OpenParenthesisToken);
+                            N(SyntaxKind.SimpleTypeName);
+                            {
+                                N(SyntaxKind.IdentifierToken, "Player");
+                            }
+                            N(SyntaxKind.CommaToken);
+                            N(SyntaxKind.VariadicTypePack);
+                            {
+                                N(SyntaxKind.DotDotDotToken);
+                                N(SyntaxKind.SimpleTypeName);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "any");
+                                }
+                            }
+                            N(SyntaxKind.CloseParenthesisToken);
+                            N(SyntaxKind.MinusGreaterThanToken);
+                            N(SyntaxKind.VariadicTypePack);
+                            {
+                                N(SyntaxKind.DotDotDotToken);
+                                N(SyntaxKind.SimpleTypeName);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "any");
+                                }
+                            }
+                        }
+                        N(SyntaxKind.CloseParenthesisToken);
+                    }
+                    N(SyntaxKind.QuestionToken);
+                }
+            }
+            EOF();
+        }
+
+        [Fact]
+        public void Parser_ParseGenericPackReturn()
+        {
+            UsingStatement("type T = (p1: any, ...any) -> any...");
+
+            N(SyntaxKind.TypeDeclarationStatement);
+            {
+                N(SyntaxKind.TypeKeyword);
+                N(SyntaxKind.IdentifierToken, "T");
+                N(SyntaxKind.EqualsToken);
+                N(SyntaxKind.FunctionType);
+                {
+                    N(SyntaxKind.OpenParenthesisToken);
+                    N(SyntaxKind.NamedType);
+                    {
+                        N(SyntaxKind.IdentifierToken, "p1");
+                        N(SyntaxKind.ColonToken);
+                        N(SyntaxKind.SimpleTypeName);
+                        {
+                            N(SyntaxKind.IdentifierToken, "any");
+                        }
+                    }
+                    N(SyntaxKind.CommaToken);
+                    N(SyntaxKind.VariadicTypePack);
+                    {
+                        N(SyntaxKind.DotDotDotToken);
+                        N(SyntaxKind.SimpleTypeName);
+                        {
+                            N(SyntaxKind.IdentifierToken, "any");
+                        }
+                    }
+                    N(SyntaxKind.CloseParenthesisToken);
+                    N(SyntaxKind.MinusGreaterThanToken);
+                    N(SyntaxKind.GenericTypePack);
+                    {
+                        N(SyntaxKind.IdentifierToken, "any");
+                        N(SyntaxKind.DotDotDotToken);
+                    }
+                }
+            }
+            EOF();
+        }
+
+        [Fact]
+        public void Parser_ParseNamedTypeInFunction()
+        {
+            UsingStatement("type T = (p1: any) -> any");
+
+            N(SyntaxKind.TypeDeclarationStatement);
+            {
+                N(SyntaxKind.TypeKeyword);
+                N(SyntaxKind.IdentifierToken, "T");
+                N(SyntaxKind.EqualsToken);
+                N(SyntaxKind.FunctionType);
+                {
+                    N(SyntaxKind.OpenParenthesisToken);
+                    N(SyntaxKind.NamedType);
+                    {
+                        N(SyntaxKind.IdentifierToken, "p1");
+                        N(SyntaxKind.ColonToken);
+                        N(SyntaxKind.SimpleTypeName);
+                        {
+                            N(SyntaxKind.IdentifierToken, "any");
+                        }
+                    }
+                    N(SyntaxKind.CloseParenthesisToken);
+                    N(SyntaxKind.MinusGreaterThanToken);
+                    N(SyntaxKind.SimpleTypeName);
+                    {
+                        N(SyntaxKind.IdentifierToken, "any");
+                    }
+                }
+            }
+            EOF();
+        }
     }
 }

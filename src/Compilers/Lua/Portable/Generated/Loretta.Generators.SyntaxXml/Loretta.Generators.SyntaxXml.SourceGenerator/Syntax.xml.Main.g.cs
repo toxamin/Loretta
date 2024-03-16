@@ -238,6 +238,9 @@ namespace Loretta.CodeAnalysis.Lua
         /// <summary>Called when the visitor visits a VariadicTypePackSyntax node.</summary>
         public virtual TResult? VisitVariadicTypePack(VariadicTypePackSyntax node) => this.DefaultVisit(node);
 
+        /// <summary>Called when the visitor visits a NamedTypeSyntax node.</summary>
+        public virtual TResult? VisitNamedType(NamedTypeSyntax node) => this.DefaultVisit(node);
+
         /// <summary>Called when the visitor visits a GenericTypePackSyntax node.</summary>
         public virtual TResult? VisitGenericTypePack(GenericTypePackSyntax node) => this.DefaultVisit(node);
 
@@ -469,6 +472,9 @@ namespace Loretta.CodeAnalysis.Lua
         /// <summary>Called when the visitor visits a VariadicTypePackSyntax node.</summary>
         public virtual void VisitVariadicTypePack(VariadicTypePackSyntax node) => this.DefaultVisit(node);
 
+        /// <summary>Called when the visitor visits a NamedTypeSyntax node.</summary>
+        public virtual void VisitNamedType(NamedTypeSyntax node) => this.DefaultVisit(node);
+
         /// <summary>Called when the visitor visits a GenericTypePackSyntax node.</summary>
         public virtual void VisitGenericTypePack(GenericTypePackSyntax node) => this.DefaultVisit(node);
 
@@ -699,6 +705,9 @@ namespace Loretta.CodeAnalysis.Lua
 
         public override SyntaxNode? VisitVariadicTypePack(VariadicTypePackSyntax node)
             => node.Update(VisitToken(node.DotDotDotToken), (TypeSyntax?)Visit(node.Type) ?? throw new ArgumentNullException("type"));
+
+        public override SyntaxNode? VisitNamedType(NamedTypeSyntax node)
+            => node.Update(VisitToken(node.Identifier), VisitToken(node.ColonToken), (TypeSyntax?)Visit(node.Type) ?? throw new ArgumentNullException("type"));
 
         public override SyntaxNode? VisitGenericTypePack(GenericTypePackSyntax node)
             => node.Update(VisitToken(node.Identifier), VisitToken(node.DotDotDotToken));
@@ -2158,6 +2167,25 @@ namespace Loretta.CodeAnalysis.Lua
         /// <summary>Creates a new VariadicTypePackSyntax instance.</summary>
         public static VariadicTypePackSyntax VariadicTypePack(TypeSyntax type)
             => SyntaxFactory.VariadicTypePack(SyntaxFactory.Token(SyntaxKind.DotDotDotToken), type);
+
+        /// <summary>
+        /// Creates a new <see cref="NamedTypeSyntax" /> node.
+        /// </summary>
+        public static NamedTypeSyntax NamedType(SyntaxToken identifier, SyntaxToken colonToken, TypeSyntax type)
+        {
+            if (identifier.Kind() != SyntaxKind.IdentifierToken) throw new ArgumentException($"Invalid kind provided. Expected IdentifierToken but got {identifier.Kind()}.", nameof(identifier));
+            if (colonToken.Kind() != SyntaxKind.ColonToken) throw new ArgumentException($"Invalid kind provided. Expected ColonToken but got {colonToken.Kind()}.", nameof(colonToken));
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            return (NamedTypeSyntax)Syntax.InternalSyntax.SyntaxFactory.NamedType((Syntax.InternalSyntax.SyntaxToken)identifier.Node!, (Syntax.InternalSyntax.SyntaxToken)colonToken.Node!, (Syntax.InternalSyntax.TypeSyntax)type.Green).CreateRed();
+        }
+
+        /// <summary>Creates a new NamedTypeSyntax instance.</summary>
+        public static NamedTypeSyntax NamedType(SyntaxToken identifier, TypeSyntax type)
+            => SyntaxFactory.NamedType(identifier, SyntaxFactory.Token(SyntaxKind.ColonToken), type);
+
+        /// <summary>Creates a new NamedTypeSyntax instance.</summary>
+        public static NamedTypeSyntax NamedType(string identifier, TypeSyntax type)
+            => SyntaxFactory.NamedType(SyntaxFactory.Identifier(identifier), SyntaxFactory.Token(SyntaxKind.ColonToken), type);
 
         /// <summary>
         /// Creates a new <see cref="GenericTypePackSyntax" /> node.

@@ -4765,6 +4765,59 @@ namespace Loretta.CodeAnalysis.Lua.Syntax
         public VariadicTypePackSyntax WithType(TypeSyntax type) => Update(this.DotDotDotToken, type);
     }
 
+    /// <summary>This node represents a named type.</summary>
+    /// <remarks>
+    /// <para>This node is associated with the following syntax kinds:</para>
+    /// <list type="bullet">
+    /// <item><description><see cref="SyntaxKind.NamedType"/></description></item>
+    /// </list>
+    /// </remarks>
+    public sealed partial class NamedTypeSyntax : TypeSyntax
+    {
+        private TypeSyntax? type;
+
+        internal NamedTypeSyntax(InternalSyntax.LuaSyntaxNode green, SyntaxNode? parent, int position)
+          : base(green, parent, position)
+        {
+        }
+
+        /// <summary>
+        /// The identifier.
+        /// </summary>
+        public SyntaxToken Identifier => new SyntaxToken(this, ((Syntax.InternalSyntax.NamedTypeSyntax)this.Green).identifier, Position, 0);
+
+        /// <summary>
+        /// Gets the <c>:</c> token.
+        /// </summary>
+        public SyntaxToken ColonToken => new SyntaxToken(this, ((Syntax.InternalSyntax.NamedTypeSyntax)this.Green).colonToken, GetChildPosition(1), GetChildIndex(1));
+
+        /// <summary>Gets the type associated with this type.</summary>
+        public TypeSyntax Type => GetRed(ref this.type, 2)!;
+
+        internal override SyntaxNode? GetNodeSlot(int index) => index == 2 ? GetRed(ref this.type, 2)! : null;
+
+        internal override SyntaxNode? GetCachedSlot(int index) => index == 2 ? this.type : null;
+
+        public override void Accept(LuaSyntaxVisitor visitor) => visitor.VisitNamedType(this);
+        public override TResult? Accept<TResult>(LuaSyntaxVisitor<TResult> visitor) where TResult : default => visitor.VisitNamedType(this);
+
+        public NamedTypeSyntax Update(SyntaxToken identifier, SyntaxToken colonToken, TypeSyntax type)
+        {
+            if (identifier != this.Identifier || colonToken != this.ColonToken || type != this.Type)
+            {
+                var newNode = SyntaxFactory.NamedType(identifier, colonToken, type);
+                var annotations = GetAnnotations();
+                return annotations?.Length > 0 ? newNode.WithAnnotations(annotations) : newNode;
+            }
+
+            return this;
+        }
+
+        public NamedTypeSyntax WithIdentifier(SyntaxToken identifier) => Update(identifier, this.ColonToken, this.Type);
+        public NamedTypeSyntax WithColonToken(SyntaxToken colonToken) => Update(this.Identifier, colonToken, this.Type);
+        public NamedTypeSyntax WithType(TypeSyntax type) => Update(this.Identifier, this.ColonToken, type);
+    }
+
     /// <summary>This node represents a generic type pack.</summary>
     /// <remarks>
     /// <para>This node is associated with the following syntax kinds:</para>

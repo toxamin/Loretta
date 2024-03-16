@@ -574,6 +574,16 @@ namespace Loretta.CodeAnalysis.Lua.Syntax
 
             return base.VisitTypeBinding(node);
         }
+        
+        // named_type
+        //   : ':' type
+        //   ;
+        public override SyntaxNode? VisitNamedType(NamedTypeSyntax node)
+        {
+            AddSpaceAfterToken(node.ColonToken);
+
+            return base.VisitNamedType(node);
+        }
 
         // generic_for_statement
         //   : 'for' typed_identifier_name (',' typed_identifier_name)* 'in' expression (',' expression)* 'do' statement_list 'end' ';'?
