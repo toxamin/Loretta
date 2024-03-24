@@ -1481,5 +1481,304 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Parsing
             }
             EOF();
         }
+
+        [Fact]
+        public void Parser_ParseTypesFullMoon()
+        {
+            UsingTree("""
+                type MyCallbackType = (cost: number, name: string) -> string
+
+                local cb: (amount: number) -> number
+                local function foo(cb: (name: string) -> ())
+                end
+
+                local function bar(x: (number)?): (baz: string) -> string
+                end
+
+                local function bar(x: (number)?): (baz: string) -> ((names: Array<string>) -> ...any)
+                end
+                """);
+
+            N(SyntaxKind.CompilationUnit);
+            {
+                N(SyntaxKind.StatementList);
+                {
+                    N(SyntaxKind.TypeDeclarationStatement);
+                    {
+                        N(SyntaxKind.TypeKeyword);
+                        N(SyntaxKind.IdentifierToken, "MyCallbackType");
+                        N(SyntaxKind.EqualsToken);
+                        N(SyntaxKind.FunctionType);
+                        {
+                            N(SyntaxKind.OpenParenthesisToken);
+                            N(SyntaxKind.NamedType);
+                            {
+                                N(SyntaxKind.IdentifierToken, "cost");
+                                N(SyntaxKind.ColonToken);
+                                N(SyntaxKind.SimpleTypeName);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "number");
+                                }
+                            }
+                            N(SyntaxKind.CommaToken);
+                            N(SyntaxKind.NamedType);
+                            {
+                                N(SyntaxKind.IdentifierToken, "name");
+                                N(SyntaxKind.ColonToken);
+                                N(SyntaxKind.SimpleTypeName);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "string");
+                                }
+                            }
+                            N(SyntaxKind.CloseParenthesisToken);
+                            N(SyntaxKind.MinusGreaterThanToken);
+                            N(SyntaxKind.SimpleTypeName);
+                            {
+                                N(SyntaxKind.IdentifierToken, "string");
+                            }
+                        }
+                    }
+                    N(SyntaxKind.LocalVariableDeclarationStatement);
+                    {
+                        N(SyntaxKind.LocalKeyword);
+                        N(SyntaxKind.LocalDeclarationName);
+                        {
+                            N(SyntaxKind.IdentifierName);
+                            {
+                                N(SyntaxKind.IdentifierToken, "cb");
+                            }
+                            N(SyntaxKind.TypeBinding);
+                            {
+                                N(SyntaxKind.ColonToken);
+                                N(SyntaxKind.FunctionType);
+                                {
+                                    N(SyntaxKind.OpenParenthesisToken);
+                                    N(SyntaxKind.NamedType);
+                                    {
+                                        N(SyntaxKind.IdentifierToken, "amount");
+                                        N(SyntaxKind.ColonToken);
+                                        N(SyntaxKind.SimpleTypeName);
+                                        {
+                                            N(SyntaxKind.IdentifierToken, "number");
+                                        }
+                                    }
+                                    N(SyntaxKind.CloseParenthesisToken);
+                                    N(SyntaxKind.MinusGreaterThanToken);
+                                    N(SyntaxKind.SimpleTypeName);
+                                    {
+                                        N(SyntaxKind.IdentifierToken, "number");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    N(SyntaxKind.LocalFunctionDeclarationStatement);
+                    {
+                        N(SyntaxKind.LocalKeyword);
+                        N(SyntaxKind.FunctionKeyword);
+                        N(SyntaxKind.IdentifierName);
+                        {
+                            N(SyntaxKind.IdentifierToken, "foo");
+                        }
+                        N(SyntaxKind.ParameterList);
+                        {
+                            N(SyntaxKind.OpenParenthesisToken);
+                            N(SyntaxKind.NamedParameter);
+                            {
+                                N(SyntaxKind.IdentifierToken, "cb");
+                                N(SyntaxKind.TypeBinding);
+                                {
+                                    N(SyntaxKind.ColonToken);
+                                    N(SyntaxKind.FunctionType);
+                                    {
+                                        N(SyntaxKind.OpenParenthesisToken);
+                                        N(SyntaxKind.NamedType);
+                                        {
+                                            N(SyntaxKind.IdentifierToken, "name");
+                                            N(SyntaxKind.ColonToken);
+                                            N(SyntaxKind.SimpleTypeName);
+                                            {
+                                                N(SyntaxKind.IdentifierToken, "string");
+                                            }
+                                        }
+                                        N(SyntaxKind.CloseParenthesisToken);
+                                        N(SyntaxKind.MinusGreaterThanToken);
+                                        N(SyntaxKind.TypePack);
+                                        {
+                                            N(SyntaxKind.OpenParenthesisToken);
+                                            N(SyntaxKind.CloseParenthesisToken);
+                                        }
+                                    }
+                                }
+                            }
+                            N(SyntaxKind.CloseParenthesisToken);
+                        }
+                        M(SyntaxKind.StatementList);
+                        {
+                        }
+                        N(SyntaxKind.EndKeyword);
+                    }
+                    N(SyntaxKind.LocalFunctionDeclarationStatement);
+                    {
+                        N(SyntaxKind.LocalKeyword);
+                        N(SyntaxKind.FunctionKeyword);
+                        N(SyntaxKind.IdentifierName);
+                        {
+                            N(SyntaxKind.IdentifierToken, "bar");
+                        }
+                        N(SyntaxKind.ParameterList);
+                        {
+                            N(SyntaxKind.OpenParenthesisToken);
+                            N(SyntaxKind.NamedParameter);
+                            {
+                                N(SyntaxKind.IdentifierToken, "x");
+                                N(SyntaxKind.TypeBinding);
+                                {
+                                    N(SyntaxKind.ColonToken);
+                                    N(SyntaxKind.NilableType);
+                                    {
+                                        N(SyntaxKind.ParenthesizedType);
+                                        {
+                                            N(SyntaxKind.OpenParenthesisToken);
+                                            N(SyntaxKind.SimpleTypeName);
+                                            {
+                                                N(SyntaxKind.IdentifierToken, "number");
+                                            }
+                                            N(SyntaxKind.CloseParenthesisToken);
+                                        }
+                                        N(SyntaxKind.QuestionToken);
+                                    }
+                                }
+                            }
+                            N(SyntaxKind.CloseParenthesisToken);
+                        }
+                        N(SyntaxKind.TypeBinding);
+                        {
+                            N(SyntaxKind.ColonToken);
+                            N(SyntaxKind.FunctionType);
+                            {
+                                N(SyntaxKind.OpenParenthesisToken);
+                                N(SyntaxKind.NamedType);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "baz");
+                                    N(SyntaxKind.ColonToken);
+                                    N(SyntaxKind.SimpleTypeName);
+                                    {
+                                        N(SyntaxKind.IdentifierToken, "string");
+                                    }
+                                }
+                                N(SyntaxKind.CloseParenthesisToken);
+                                N(SyntaxKind.MinusGreaterThanToken);
+                                N(SyntaxKind.SimpleTypeName);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "string");
+                                }
+                            }
+                        }
+                        M(SyntaxKind.StatementList);
+                        {
+                        }
+                        N(SyntaxKind.EndKeyword);
+                    }
+                    N(SyntaxKind.LocalFunctionDeclarationStatement);
+                    {
+                        N(SyntaxKind.LocalKeyword);
+                        N(SyntaxKind.FunctionKeyword);
+                        N(SyntaxKind.IdentifierName);
+                        {
+                            N(SyntaxKind.IdentifierToken, "bar");
+                        }
+                        N(SyntaxKind.ParameterList);
+                        {
+                            N(SyntaxKind.OpenParenthesisToken);
+                            N(SyntaxKind.NamedParameter);
+                            {
+                                N(SyntaxKind.IdentifierToken, "x");
+                                N(SyntaxKind.TypeBinding);
+                                {
+                                    N(SyntaxKind.ColonToken);
+                                    N(SyntaxKind.NilableType);
+                                    {
+                                        N(SyntaxKind.ParenthesizedType);
+                                        {
+                                            N(SyntaxKind.OpenParenthesisToken);
+                                            N(SyntaxKind.SimpleTypeName);
+                                            {
+                                                N(SyntaxKind.IdentifierToken, "number");
+                                            }
+                                            N(SyntaxKind.CloseParenthesisToken);
+                                        }
+                                        N(SyntaxKind.QuestionToken);
+                                    }
+                                }
+                            }
+                            N(SyntaxKind.CloseParenthesisToken);
+                        }
+                        N(SyntaxKind.TypeBinding);
+                        {
+                            N(SyntaxKind.ColonToken);
+                            N(SyntaxKind.FunctionType);
+                            {
+                                N(SyntaxKind.OpenParenthesisToken);
+                                N(SyntaxKind.NamedType);
+                                {
+                                    N(SyntaxKind.IdentifierToken, "baz");
+                                    N(SyntaxKind.ColonToken);
+                                    N(SyntaxKind.SimpleTypeName);
+                                    {
+                                        N(SyntaxKind.IdentifierToken, "string");
+                                    }
+                                }
+                                N(SyntaxKind.CloseParenthesisToken);
+                                N(SyntaxKind.MinusGreaterThanToken);
+                                N(SyntaxKind.ParenthesizedType);
+                                {
+                                    N(SyntaxKind.OpenParenthesisToken);
+                                    N(SyntaxKind.FunctionType);
+                                    {
+                                        N(SyntaxKind.OpenParenthesisToken);
+                                        N(SyntaxKind.NamedType);
+                                        {
+                                            N(SyntaxKind.IdentifierToken, "names");
+                                            N(SyntaxKind.ColonToken);
+                                            N(SyntaxKind.SimpleTypeName);
+                                            {
+                                                N(SyntaxKind.IdentifierToken, "Array");
+                                                N(SyntaxKind.TypeArgumentList);
+                                                {
+                                                    N(SyntaxKind.LessThanToken);
+                                                    N(SyntaxKind.SimpleTypeName);
+                                                    {
+                                                        N(SyntaxKind.IdentifierToken, "string");
+                                                    }
+                                                    N(SyntaxKind.GreaterThanToken);
+                                                }
+                                            }
+                                        }
+                                        N(SyntaxKind.CloseParenthesisToken);
+                                        N(SyntaxKind.MinusGreaterThanToken);
+                                        N(SyntaxKind.VariadicTypePack);
+                                        {
+                                            N(SyntaxKind.DotDotDotToken);
+                                            N(SyntaxKind.SimpleTypeName);
+                                            {
+                                                N(SyntaxKind.IdentifierToken, "any");
+                                            }
+                                        }
+                                    }
+                                    N(SyntaxKind.CloseParenthesisToken);
+                                }
+                            }
+                        }
+                        M(SyntaxKind.StatementList);
+                        {
+                        }
+                        N(SyntaxKind.EndKeyword);
+                    }
+                }
+                N(SyntaxKind.EndOfFileToken);
+            }
+            EOF();
+        }
     }
 }
