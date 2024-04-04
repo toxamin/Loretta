@@ -336,10 +336,13 @@ fourth line \xFF.";
                     longStringContent);
             }
 
-            yield return new ShortToken(
-                SyntaxKind.HashStringLiteralToken,
-                $"`{shortStringContentText}`",
-                Hash.GetJenkinsOneAtATimeHashCode(shortStringContentValue.ToLowerInvariant().AsSpan()));
+            if (options.AcceptHashStrings)
+            {
+                yield return new ShortToken(
+                    SyntaxKind.HashStringLiteralToken,
+                    $"`{shortStringContentText}`",
+                    Hash.GetJenkinsOneAtATimeHashCode(shortStringContentValue.AsSpan()));
+            }
 
             #endregion Strings
 
