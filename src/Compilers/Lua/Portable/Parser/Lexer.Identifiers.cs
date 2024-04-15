@@ -16,8 +16,11 @@
                     info.Kind = SyntaxKind.IdentifierToken;
                 }
 
-                if (info.Kind is SyntaxKind.None)
+                if (info.Kind is SyntaxKind.None
+                    || (info.Kind is SyntaxKind.ContinueKeyword && _options.SyntaxOptions.ContinueType == ContinueType.None))
+                {
                     info.Kind = SyntaxKind.IdentifierToken;
+                }
 
                 return true;
             }

@@ -165,20 +165,25 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                     case SyntaxKind.SemicolonToken when Options.SyntaxOptions.AcceptEmptyStatements:
                         return SyntaxFactory.EmptyStatement(EatToken(SyntaxKind.SemicolonToken));
 
-                    case SyntaxKind.IdentifierToken
-                        when CurrentToken.ContextualKind is SyntaxKind.ExportKeyword
-                                                         or SyntaxKind.TypeKeyword:
-                        return ParseTypeDeclarationStatement();
-
                     default:
                     {
-                        if (CurrentToken.ContextualKind == SyntaxKind.ContinueKeyword)
-                            return ParseContinueStatement();
-
+                        var possiblyContinue = CurrentToken.ContextualKind == SyntaxKind.ContinueKeyword;
+                        var possiblyType = CurrentToken.ContextualKind == SyntaxKind.TypeKeyword || CurrentToken.ContextualKind == SyntaxKind.ExportKeyword;
                         var restorePoint = GetResetPoint();
                         var expression = ParsePrefixOrVariableExpression();
                         if (expression.IsMissing)
                         {
+                            if (possiblyContinue)
+                            {
+                                Reset(ref restorePoint);
+                                return ParseContinueStatement();
+                            }
+                            if (possiblyType)
+                            {
+                                Reset(ref restorePoint);
+                                return ParseTypeDeclarationStatement();
+                            }
+
                             // If the expression is missing, reset and then consume the token we cannot process
                             // generating a *minimal* missing statement so that we can continue.
                             Reset(ref restorePoint);
@@ -206,6 +211,16 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                             var node = SyntaxFactory.ExpressionStatement(expression, semicolonToken);
                             if (expression.Kind is not (SyntaxKind.FunctionCallExpression or SyntaxKind.MethodCallExpression))
                             {
+                                if (possiblyContinue)
+                                {
+                                    Reset(ref restorePoint);
+                                    return ParseContinueStatement();
+                                }
+                                if (possiblyType)
+                                {
+                                    Reset(ref restorePoint);
+                                    return ParseTypeDeclarationStatement();
+                                }
                                 node = AddError(node, ErrorCode.ERR_NonFunctionCallBeingUsedAsStatement);
                             }
 
