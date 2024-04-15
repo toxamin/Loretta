@@ -36,7 +36,7 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Lexical
                                   where !SyntaxFacts.IsManufacturedToken(kind, options)
                                   let text = SyntaxFacts.GetText(kind)
                                   where !string.IsNullOrEmpty(text)
-                                    && (text != "//" || options.AcceptFloorDivision)
+                                    && ((text != "//" && text != "//=") || options.AcceptFloorDivision)
                                   select new ShortToken(kind, text))
             {
                 yield return token;
@@ -394,6 +394,8 @@ fourth line \xFF.";
             from tokenA in GetTokens(options)
             from tokB in GetTokens(options)
             where !SyntaxFacts.RequiresSeparator(tokenA.Kind, tokenA.Text, tokB.Kind, tokB.Text)
+            where !(tokenA.Kind == SyntaxKind.SlashSlashToken && tokB.Kind == SyntaxKind.SlashEqualsToken)
+            where !(tokenA.Kind == SyntaxKind.SlashToken && tokB.Kind == SyntaxKind.SlashSlashEqualsToken)
             let tokenB = tokB.WithSpan(new TextSpan(tokenA.Span.End, tokB.Span.Length))
             select (tokenA, tokenB);
 

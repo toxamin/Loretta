@@ -558,12 +558,15 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
         private ContinueStatementSyntax ParseContinueStatement()
         {
-            LorettaDebug.Assert(Options.SyntaxOptions.ContinueType is ContinueType.ContextualKeyword or ContinueType.Keyword);
-            var continueKeyword = Options.SyntaxOptions.ContinueType == ContinueType.ContextualKeyword
+            var continueKeyword = Options.SyntaxOptions.ContinueType != ContinueType.Keyword
                 ? EatContextualToken(SyntaxKind.ContinueKeyword)
                 : EatTokenWithPrejudice(SyntaxKind.ContinueKeyword);
             var semicolonToken = TryMatchSemicolon();
-            return SyntaxFactory.ContinueStatement(continueKeyword, semicolonToken);
+
+            var statement = SyntaxFactory.ContinueStatement(continueKeyword, semicolonToken);
+            if (Options.SyntaxOptions.ContinueType == ContinueType.None)
+                statement = AddError(statement, ErrorCode.ERR_ContinueNotSupportedInLuaVersion);
+            return statement;
         }
 
         private GotoLabelStatementSyntax ParseGotoLabelStatement()

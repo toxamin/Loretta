@@ -372,7 +372,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                             TextWindow.AdvanceChar();
                             switch (TextWindow.PeekChar())
                             {
-                                case '=' when _options.SyntaxOptions.AcceptCompoundAssignment:
+                                case '=':
                                     TextWindow.AdvanceChar();
                                     info.Kind = SyntaxKind.SlashSlashEqualsToken;
                                     break;

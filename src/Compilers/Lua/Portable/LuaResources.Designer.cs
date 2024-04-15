@@ -142,6 +142,15 @@ namespace Loretta.CodeAnalysis.Lua {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Continue is not supported in this lua version.
+        /// </summary>
+        internal static string ERR_ContinueNotSupportedInLuaVersion {
+            get {
+                return ResourceManager.GetString("ERR_ContinueNotSupportedInLuaVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Constant represents a value either too large or too small for a double precision floating-point number.
         /// </summary>
         internal static string ERR_DoubleOverflow {

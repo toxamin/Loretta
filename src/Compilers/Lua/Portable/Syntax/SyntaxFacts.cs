@@ -48,7 +48,7 @@ namespace Loretta.CodeAnalysis.Lua
         public static bool IsContextualKeyword(SyntaxKind kind, LuaSyntaxOptions syntaxOptions) =>
             kind switch
             {
-                SyntaxKind.ContinueKeyword when syntaxOptions.ContinueType == ContinueType.ContextualKeyword => true,
+                SyntaxKind.ContinueKeyword when syntaxOptions.ContinueType != ContinueType.Keyword => true,
                 SyntaxKind.TypeKeyword => true,
                 SyntaxKind.ExportKeyword => true,
                 SyntaxKind.TypeofKeyword => true,
