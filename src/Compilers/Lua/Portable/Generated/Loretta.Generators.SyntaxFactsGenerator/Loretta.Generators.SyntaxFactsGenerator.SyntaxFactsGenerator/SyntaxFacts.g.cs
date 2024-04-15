@@ -783,6 +783,7 @@ namespace Loretta.CodeAnalysis.Lua
                 SyntaxKind.QuestionToken => "?",
                 SyntaxKind.SemicolonToken => ";",
                 SyntaxKind.SlashEqualsToken => "/=",
+                SyntaxKind.SlashSlashEqualsToken => "//=",
                 SyntaxKind.SlashSlashToken => "//",
                 SyntaxKind.SlashToken => "/",
                 SyntaxKind.StarEqualsToken => "*=",
@@ -835,6 +836,7 @@ namespace Loretta.CodeAnalysis.Lua
                 SyntaxKind.HatEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.HatToken,
                 SyntaxKind.PercentEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.PercentToken,
                 SyntaxKind.DotDotEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.DotDotToken,
+                SyntaxKind.SlashSlashEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.SlashSlashToken,
                 _ => default,
             };
         }
@@ -850,6 +852,7 @@ namespace Loretta.CodeAnalysis.Lua
                 SyntaxKind.HatEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.ExponentiateAssignmentStatement,
                 SyntaxKind.PercentEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.ModuloAssignmentStatement,
                 SyntaxKind.DotDotEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.ConcatAssignmentStatement,
+                SyntaxKind.SlashSlashEqualsToken => Loretta.CodeAnalysis.Lua.SyntaxKind.FloorDivideAssignmentStatement,
                 _ => default,
             };
         }
@@ -904,6 +907,7 @@ namespace Loretta.CodeAnalysis.Lua
                 SyntaxKind.ModuloAssignmentStatement => Loretta.CodeAnalysis.Lua.SyntaxKind.PercentEqualsToken,
                 SyntaxKind.ConcatAssignmentStatement => Loretta.CodeAnalysis.Lua.SyntaxKind.DotDotEqualsToken,
                 SyntaxKind.ExponentiateAssignmentStatement => Loretta.CodeAnalysis.Lua.SyntaxKind.HatEqualsToken,
+                SyntaxKind.FloorDivideAssignmentStatement => Loretta.CodeAnalysis.Lua.SyntaxKind.SlashSlashEqualsToken,
                 _ => default,
             };
         }
@@ -1046,6 +1050,7 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.ReturnKeyword:
                 case SyntaxKind.SemicolonToken:
                 case SyntaxKind.SlashEqualsToken:
+                case SyntaxKind.SlashSlashEqualsToken:
                 case SyntaxKind.SlashSlashToken:
                 case SyntaxKind.SlashToken:
                 case SyntaxKind.StarEqualsToken:
@@ -1183,6 +1188,7 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.PercentEqualsToken:
                 case SyntaxKind.PlusEqualsToken:
                 case SyntaxKind.SlashEqualsToken:
+                case SyntaxKind.SlashSlashEqualsToken:
                 case SyntaxKind.StarEqualsToken:
                     return true;
 
@@ -1204,6 +1210,7 @@ namespace Loretta.CodeAnalysis.Lua
             SyntaxKind.HatEqualsToken,
             SyntaxKind.PercentEqualsToken,
             SyntaxKind.DotDotEqualsToken,
+            SyntaxKind.SlashSlashEqualsToken,
         });
 
         /// <summary>
@@ -1415,6 +1422,7 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.ConcatAssignmentStatement:
                 case SyntaxKind.DivideAssignmentStatement:
                 case SyntaxKind.ExponentiateAssignmentStatement:
+                case SyntaxKind.FloorDivideAssignmentStatement:
                 case SyntaxKind.ModuloAssignmentStatement:
                 case SyntaxKind.MultiplyAssignmentStatement:
                 case SyntaxKind.SubtractAssignmentStatement:
@@ -1438,6 +1446,7 @@ namespace Loretta.CodeAnalysis.Lua
             SyntaxKind.ModuloAssignmentStatement,
             SyntaxKind.ConcatAssignmentStatement,
             SyntaxKind.ExponentiateAssignmentStatement,
+            SyntaxKind.FloorDivideAssignmentStatement,
         });
     }
 }

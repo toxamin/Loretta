@@ -370,6 +370,15 @@ namespace Loretta.CodeAnalysis.Lua
         [BinaryOperator(precedence: 11, FloorDivideExpression)]
         SlashSlashToken = 56,
 
+        /// <summary>
+        /// Represents the <c>//=</c> token.
+        /// </summary>
+        [Token(Text = "//=")]
+        [ExtraCategories(SyntaxKindCategory.CompoundAssignmentOperatorToken)]
+        [Property(SyntaxKindProperty.CompoundAssignmentOperator, SlashSlashToken)]
+        [Property(SyntaxKindProperty.CompoundAssignmentStatement, FloorDivideAssignmentStatement)]
+        SlashSlashEqualsToken = 57,
+
         // Big gap 53-500 (insert new fixed-text tokens here)
 
         // Keywords
@@ -691,6 +700,10 @@ namespace Loretta.CodeAnalysis.Lua
         [ExtraCategories(SyntaxKindCategory.CompoundAssignmentStatement)]
         [Property(SyntaxKindProperty.OperatorTokenKind, HatEqualsToken)]
         ExponentiateAssignmentStatement = 2052,
+        [ExtraCategories(SyntaxKindCategory.CompoundAssignmentStatement)]
+        [Property(SyntaxKindProperty.OperatorTokenKind, SlashSlashEqualsToken)]
+        FloorDivideAssignmentStatement = 2114,
+
 
         // Control Flow Statements
         NumericForStatement = 2053,
