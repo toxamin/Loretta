@@ -395,6 +395,8 @@ fourth line \xFF.";
             from tokB in GetTokens(options)
             where !SyntaxFacts.RequiresSeparator(tokenA.Kind, tokenA.Text, tokB.Kind, tokB.Text)
             where !(tokenA.Kind == SyntaxKind.SlashSlashToken && tokB.Kind == SyntaxKind.SlashEqualsToken)
+            where !(tokenA.Kind == SyntaxKind.SlashSlashToken && tokB.Kind == SyntaxKind.EqualsToken)
+            where !(tokenA.Kind == SyntaxKind.SlashSlashToken && tokB.Kind == SyntaxKind.EqualsEqualsToken)
             where !(tokenA.Kind == SyntaxKind.SlashToken && tokB.Kind == SyntaxKind.SlashSlashEqualsToken)
             let tokenB = tokB.WithSpan(new TextSpan(tokenA.Span.End, tokB.Span.Length))
             select (tokenA, tokenB);
