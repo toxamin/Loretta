@@ -61,6 +61,8 @@
         ERR_OnlyOneTableTypeIndexerIsAllowed = 1017,
         ERR_NormalTypeParametersComeBeforePacks = 1018,
         ERR_ContinueNotSupportedInLuaVersion = 1019,
+        ERR_GotoNotSupportedInLuaVersion = 1020,
+        ERR_LocalVariableAttributesNotSupportedInLuaVersion = 1021,
 
         // MessageProvider stuff
         ERR_BadDocumentationMode = 2000,

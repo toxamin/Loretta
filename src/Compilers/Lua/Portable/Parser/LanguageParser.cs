@@ -281,6 +281,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                     lessThanToken,
                     identifier,
                     greaterThanToken);
+                
+                if (!Options.SyntaxOptions.AcceptLocalVariableAttributes)
+                    attribute = AddError(attribute, ErrorCode.ERR_LocalVariableAttributesNotSupportedInLuaVersion);
             }
             TypeBindingSyntax? typeBinding = TryParseTypeBinding();
 
@@ -543,10 +546,16 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             var gotoKeyword = EatToken(SyntaxKind.GotoKeyword);
             var labelName = EatToken(SyntaxKind.IdentifierToken);
             var semicolonToken = TryMatchSemicolon();
-            return SyntaxFactory.GotoStatement(
+
+            var statement = SyntaxFactory.GotoStatement(
                 gotoKeyword,
                 labelName,
                 semicolonToken);
+
+            if (!Options.SyntaxOptions.AcceptGoto)
+                statement = AddError(statement, ErrorCode.ERR_GotoNotSupportedInLuaVersion);
+
+            return statement;
         }
 
         private BreakStatementSyntax ParseBreakStatement()
@@ -575,11 +584,16 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             var identifier = EatToken(SyntaxKind.IdentifierToken);
             var rightDelimiterToken = EatToken(SyntaxKind.ColonColonToken);
             var semicolonToken = TryMatchSemicolon();
-            return SyntaxFactory.GotoLabelStatement(
+
+            var statement = SyntaxFactory.GotoLabelStatement(
                 leftDelimiterToken,
                 identifier,
                 rightDelimiterToken,
                 semicolonToken);
+
+            if (!Options.SyntaxOptions.AcceptGoto)
+                statement = AddError(statement, ErrorCode.ERR_GotoNotSupportedInLuaVersion);
+            return statement;
         }
 
         private FunctionDeclarationStatementSyntax ParseFunctionDeclarationStatement()

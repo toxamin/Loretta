@@ -148,6 +148,9 @@
   <data name="ERR_ContinueNotSupportedInLuaVersion" xml:space="preserve">
     <value>Continue is not supported in this lua version</value>
   </data>
+  <data name="ERR_GotoNotSupportedInLuaVersion" xml:space="preserve">
+    <value>Goto is not supported in this lua version</value>
+  </data>
   <data name="ERR_DoubleOverflow" xml:space="preserve">
     <value>Constant represents a value either too large or too small for a double precision floating-point number</value>
   </data>
@@ -268,6 +271,9 @@
   </data>
   <data name="ERR_TypedLuaNotSupportedInLuaVersion" xml:space="preserve">
     <value>Typed lua is not supported in this lua version</value>
+  </data>
+  <data name="ERR_LocalVariableAttributesNotSupportedInLuaVersion" xml:space="preserve">
+    <value>Local variable attributes are not supported in this lua version</value>
   </data>
   <data name="ERR_UnderscoreInNumericLiteralNotSupportedInVersion" xml:space="preserve">
     <value>Underscores in numeric literals are not supported in this lua version</value>
