@@ -42,7 +42,8 @@ namespace Loretta.CodeAnalysis.Lua
             acceptTypedLua: false,
             acceptFloorDivision: false,
             acceptLuaJITNumberSuffixes: false,
-            acceptNestingOfLongStrings: false);
+            acceptNestingOfLongStrings: false,
+            acceptInterpolatedStrings: false);
 
         /// <summary>
         /// The Lua 5.2 preset.
@@ -103,7 +104,8 @@ namespace Loretta.CodeAnalysis.Lua
             acceptTypedLua: false,
             acceptFloorDivision: false,
             acceptLuaJITNumberSuffixes: true,
-            acceptNestingOfLongStrings: true);
+            acceptNestingOfLongStrings: true,
+            acceptInterpolatedStrings: false);
 
         /// <summary>
         /// The LuaJIT 2.1-beta3 preset.
@@ -154,7 +156,8 @@ namespace Loretta.CodeAnalysis.Lua
             acceptTypedLua: true,
             acceptFloorDivision: true,
             acceptLuaJITNumberSuffixes: false,
-            acceptNestingOfLongStrings: true);
+            acceptNestingOfLongStrings: true,
+            acceptInterpolatedStrings: true);
 
         /// <summary>
         /// The Luau preset.
@@ -190,7 +193,7 @@ namespace Loretta.CodeAnalysis.Lua
             acceptUnicodeEscape: true,
             continueType: ContinueType.ContextualKeyword,
             acceptIfExpression: true,
-            acceptHashStrings: true,
+            acceptHashStrings: false,
             acceptInvalidEscapes: false,
             acceptLocalVariableAttributes: true,
             binaryIntegerFormat: IntegerFormats.NotSupported,
@@ -200,7 +203,8 @@ namespace Loretta.CodeAnalysis.Lua
             acceptTypedLua: true,
             acceptFloorDivision: false,
             acceptLuaJITNumberSuffixes: true,
-            acceptNestingOfLongStrings: true);
+            acceptNestingOfLongStrings: true,
+            acceptInterpolatedStrings: true);
 
         /// <summary>
         /// Same as <see cref="All"/> but with integer settings set
@@ -214,7 +218,9 @@ namespace Loretta.CodeAnalysis.Lua
             octalIntegerFormat: IntegerFormats.Int64,
             decimalIntegerFormat: IntegerFormats.Int64,
             hexIntegerFormat: IntegerFormats.Int64,
-            acceptFloorDivision: true);
+            acceptFloorDivision: true,
+            acceptHashStrings: true,
+            acceptInterpolatedStrings: false);
 
         /// <summary>
         /// All presets that are preconfigured in <see cref="LuaSyntaxOptions"/>.
@@ -265,6 +271,7 @@ namespace Loretta.CodeAnalysis.Lua
         /// <param name="acceptFloorDivision"><inheritdoc cref="AcceptFloorDivision" path="/summary" /></param>
         /// <param name="acceptLuaJITNumberSuffixes"><inheritdoc cref="AcceptLuaJITNumberSuffixes" path="/summary" /></param>
         /// <param name="acceptNestingOfLongStrings"><inheritdoc cref="AcceptNestingOfLongStrings" path="/summary" /></param>
+        /// <param name="acceptInterpolatedStrings"></param>
         public LuaSyntaxOptions(
             bool acceptBinaryNumbers,
             bool acceptCCommentSyntax,
@@ -293,13 +300,18 @@ namespace Loretta.CodeAnalysis.Lua
             bool acceptTypedLua,
             bool acceptFloorDivision,
             bool acceptLuaJITNumberSuffixes,
-            bool acceptNestingOfLongStrings)
+            bool acceptNestingOfLongStrings,
+            bool acceptInterpolatedStrings)
         {
             if (acceptFloorDivision && acceptCCommentSyntax)
             {
                 throw new ArgumentException("AcceptFloorDivision and AcceptCCommentSyntax cannot be enabled simultaneously.");
             }
 
+            if (AcceptHashStrings && AcceptInterpolatedStrings)
+            {
+                throw new ArgumentException("AcceptHashStrings and AcceptInterpolatedStrings cannot be enabled simultaneously.");
+            }
             AcceptBinaryNumbers = acceptBinaryNumbers;
             AcceptCCommentSyntax = acceptCCommentSyntax;
             AcceptCompoundAssignment = acceptCompoundAssignment;
@@ -328,6 +340,7 @@ namespace Loretta.CodeAnalysis.Lua
             AcceptFloorDivision = acceptFloorDivision;
             AcceptLuaJITNumberSuffixes = acceptLuaJITNumberSuffixes;
             AcceptNestingOfLongStrings = acceptNestingOfLongStrings;
+            AcceptInterpolatedStrings = acceptInterpolatedStrings;
         }
 
         /// <summary>
@@ -482,6 +495,11 @@ namespace Loretta.CodeAnalysis.Lua
         public bool AcceptNestingOfLongStrings { get; }
 
         /// <summary>
+        /// Whether to accept interpolated strings or not
+        /// </summary>
+        public bool AcceptInterpolatedStrings { get; }
+
+        /// <summary>
         /// Creates a new lua options changing the provided fields.
         /// </summary>
         /// <param name="acceptBinaryNumbers">
@@ -601,6 +619,11 @@ namespace Loretta.CodeAnalysis.Lua
         /// of <see cref="AcceptNestingOfLongStrings"/>.
         /// </param>
         /// <returns></returns>
+        /// /// <param name="acceptInterpolatedStrings">
+        /// <inheritdoc cref="AcceptInterpolatedStrings" path="/summary" /> If None uses the value
+        /// of <see cref="AcceptInterpolatedStrings"/>.
+        /// </param>
+        /// <returns></returns>
         public LuaSyntaxOptions With(
             Option<bool> acceptBinaryNumbers = default,
             Option<bool> acceptCCommentSyntax = default,
@@ -629,7 +652,8 @@ namespace Loretta.CodeAnalysis.Lua
             Option<bool> acceptTypedLua = default,
             Option<bool> acceptFloorDivision = default,
             Option<bool> acceptLuaJITNumberSuffixes = default,
-            Option<bool> acceptNestingOfLongStrings = default) =>
+            Option<bool> acceptNestingOfLongStrings = default,
+            Option<bool> acceptInterpolatedStrings = default) =>
             new(
                 acceptBinaryNumbers.UnwrapOr(AcceptBinaryNumbers),
                 acceptCCommentSyntax.UnwrapOr(AcceptCCommentSyntax),
@@ -658,7 +682,8 @@ namespace Loretta.CodeAnalysis.Lua
                 acceptTypedLua.UnwrapOr(AcceptTypedLua),
                 acceptFloorDivision.UnwrapOr(AcceptFloorDivision),
                 acceptLuaJITNumberSuffixes.UnwrapOr(AcceptLuaJITNumberSuffixes),
-                acceptNestingOfLongStrings.UnwrapOr(AcceptNestingOfLongStrings)
+                acceptNestingOfLongStrings.UnwrapOr(AcceptNestingOfLongStrings),
+                acceptInterpolatedStrings.UnwrapOr(AcceptInterpolatedStrings)
                 );
 
         /// <inheritdoc/>
@@ -694,7 +719,8 @@ namespace Loretta.CodeAnalysis.Lua
                 && AcceptTypedLua == other.AcceptTypedLua
                 && AcceptFloorDivision == other.AcceptFloorDivision
                 && AcceptLuaJITNumberSuffixes == other.AcceptLuaJITNumberSuffixes
-                && AcceptNestingOfLongStrings == other.AcceptNestingOfLongStrings);
+                && AcceptNestingOfLongStrings == other.AcceptNestingOfLongStrings
+                && AcceptInterpolatedStrings == other.AcceptInterpolatedStrings);
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -726,6 +752,7 @@ namespace Loretta.CodeAnalysis.Lua
             hash.Add(AcceptFloorDivision);
             hash.Add(AcceptLuaJITNumberSuffixes);
             hash.Add(AcceptNestingOfLongStrings);
+            hash.Add(AcceptInterpolatedStrings);
             return hash.ToHashCode();
         }
 
@@ -778,7 +805,7 @@ namespace Loretta.CodeAnalysis.Lua
             }
             else
             {
-                return $"{{ AcceptBinaryNumbers = {AcceptBinaryNumbers}, AcceptCCommentSyntax = {AcceptCCommentSyntax}, AcceptCompoundAssignment = {AcceptCompoundAssignment}, AcceptEmptyStatements = {AcceptEmptyStatements}, AcceptCBooleanOperators = {AcceptCBooleanOperators}, AcceptGoto = {AcceptGoto}, AcceptHexEscapesInStrings = {AcceptHexEscapesInStrings}, AcceptHexFloatLiterals = {AcceptHexFloatLiterals}, AcceptOctalNumbers = {AcceptOctalNumbers}, AcceptShebang = {AcceptShebang}, AcceptUnderscoreInNumberLiterals = {AcceptUnderscoreInNumberLiterals}, UseLuaJitIdentifierRules = {UseLuaJitIdentifierRules}, AcceptBitwiseOperators = {AcceptBitwiseOperators}, AcceptWhitespaceEscape = {AcceptWhitespaceEscape}, ContinueType = {ContinueType}, AcceptIfExpressions = {AcceptIfExpressions}, AcceptHashStrings = {AcceptHashStrings}, AcceptLocalVariableAttributes = {AcceptLocalVariableAttributes}, BinaryIntegerFormat = {BinaryIntegerFormat}, OctalIntegerFormat = {OctalIntegerFormat}, DecimalIntegerFormat = {DecimalIntegerFormat}, HexIntegerFormat = {HexIntegerFormat}, AcceptTypedLua = {AcceptTypedLua}, AcceptFloorDivision = {AcceptFloorDivision}, AcceptLuaJITNumberSuffixes = {AcceptLuaJITNumberSuffixes}, AcceptNestingOfLongStrings = {AcceptNestingOfLongStrings} }}";
+                return $"{{ AcceptBinaryNumbers = {AcceptBinaryNumbers}, AcceptCCommentSyntax = {AcceptCCommentSyntax}, AcceptCompoundAssignment = {AcceptCompoundAssignment}, AcceptEmptyStatements = {AcceptEmptyStatements}, AcceptCBooleanOperators = {AcceptCBooleanOperators}, AcceptGoto = {AcceptGoto}, AcceptHexEscapesInStrings = {AcceptHexEscapesInStrings}, AcceptHexFloatLiterals = {AcceptHexFloatLiterals}, AcceptOctalNumbers = {AcceptOctalNumbers}, AcceptShebang = {AcceptShebang}, AcceptUnderscoreInNumberLiterals = {AcceptUnderscoreInNumberLiterals}, UseLuaJitIdentifierRules = {UseLuaJitIdentifierRules}, AcceptBitwiseOperators = {AcceptBitwiseOperators}, AcceptWhitespaceEscape = {AcceptWhitespaceEscape}, ContinueType = {ContinueType}, AcceptIfExpressions = {AcceptIfExpressions}, AcceptHashStrings = {AcceptHashStrings}, AcceptLocalVariableAttributes = {AcceptLocalVariableAttributes}, BinaryIntegerFormat = {BinaryIntegerFormat}, OctalIntegerFormat = {OctalIntegerFormat}, DecimalIntegerFormat = {DecimalIntegerFormat}, HexIntegerFormat = {HexIntegerFormat}, AcceptTypedLua = {AcceptTypedLua}, AcceptFloorDivision = {AcceptFloorDivision}, AcceptLuaJITNumberSuffixes = {AcceptLuaJITNumberSuffixes}, AcceptNestingOfLongStrings = {AcceptNestingOfLongStrings}, AcceptInterpolatedStrings = {AcceptInterpolatedStrings} }}";
             }
         }
 

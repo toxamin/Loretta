@@ -580,16 +580,22 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
                 case '`':
                 {
-                    info.Kind = SyntaxKind.HashStringLiteralToken;
-                    var stringValue = ParseShortString();
-                    // Jenkins' one-at-a-time hash doesn't do this but FiveM does.
-                    stringValue = stringValue.ToLowerInvariant();
-                    info.ValueKind = ValueKind.UInt;
-                    info.UIntValue = Hash.GetJenkinsOneAtATimeHashCode(stringValue.AsSpan());
-                    info.Text = TextWindow.GetText(intern: true);
 
-                    if (!_options.SyntaxOptions.AcceptHashStrings)
-                        AddError(ErrorCode.ERR_HashStringsNotSupportedInVersion);
+                    if (_options.SyntaxOptions.AcceptInterpolatedStrings) {
+                        // TODO: Implement interpolated strings
+                        
+                    } else {
+                        info.Kind = SyntaxKind.HashStringLiteralToken;
+                        var stringValue = ParseShortString();
+                        // Jenkins' one-at-a-time hash doesn't do this but FiveM does.
+                        stringValue = stringValue.ToLowerInvariant();
+                        info.ValueKind = ValueKind.UInt;
+                        info.UIntValue = Hash.GetJenkinsOneAtATimeHashCode(stringValue.AsSpan());
+                        info.Text = TextWindow.GetText(intern: true);
+
+                        if (!_options.SyntaxOptions.AcceptHashStrings)
+                            AddError(ErrorCode.ERR_HashStringsNotSupportedInVersion);
+                    }
 
                     return;
                 }
