@@ -57,7 +57,7 @@ namespace Loretta.CodeAnalysis.Lua
                     // don't produce locations outside of tree span
                     LorettaDebug.Assert(_syntaxTree is not null);
                     var length = _syntaxTree.GetRoot().FullSpan.Length;
-                    var spanStart = Math.Min(_position - leadingWidthAlreadyCounted + sdi.Offset, length);
+                    var spanStart = Math.Max(0, Math.Min(_position - leadingWidthAlreadyCounted + sdi.Offset, length));
                     var spanWidth = Math.Min(spanStart + sdi.Width, length) - spanStart;
 
                     _current = new LuaDiagnostic(sdi, new SourceLocation(_syntaxTree, new TextSpan(spanStart, spanWidth)));
