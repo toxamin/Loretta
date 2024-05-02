@@ -378,6 +378,9 @@ namespace Loretta.CodeAnalysis.Lua
         [Property(SyntaxKindProperty.CompoundAssignmentOperator, SlashSlashToken)]
         [Property(SyntaxKindProperty.CompoundAssignmentStatement, FloorDivideAssignmentStatement)]
         SlashSlashEqualsToken = 57,
+        
+        InterpolatedStringStartToken = 58,
+        InterpolatedStringEndToken = 59,
 
         // Big gap 53-500 (insert new fixed-text tokens here)
 
@@ -403,7 +406,7 @@ namespace Loretta.CodeAnalysis.Lua
         [Keyword("repeat")]
         RepeatKeyword = 503,
         /// <summary>
-        /// Represents the <see langword="util"/> keyword.
+        /// Represents the <see langword="until"/> keyword.
         /// </summary>
         [Keyword("until")]
         UntilKeyword = 504,
@@ -541,6 +544,8 @@ namespace Loretta.CodeAnalysis.Lua
         [ExtraCategories(SyntaxKindCategory.LiteralToken)]
         [Property(SyntaxKindProperty.LiteralExpression, HashStringLiteralExpression)]
         HashStringLiteralToken = 1004,
+        InterpolatedStringToken = 1005,
+        InterpolatedStringTextToken = 1006,
 
         // Big gap 1005-2000 (insert new tokens with text here)
 
@@ -568,6 +573,8 @@ namespace Loretta.CodeAnalysis.Lua
         VariableAttribute = 2084,
         LocalDeclarationName = 2085,
         TypedIdentifierName = 2118,
+        Interpolation = 2120,
+        InterpolatedStringText = 2121,
 
         // Primary Expressions
         [ExtraCategories(SyntaxKindCategory.FunctionExpressionOrDeclaration)]
@@ -584,6 +591,7 @@ namespace Loretta.CodeAnalysis.Lua
         IfExpression = 2080,
         ElseIfExpressionClause = 2081,
         HashStringLiteralExpression = 2082,
+        InterpolatedStringExpression = 2119,
 
         // Unary Expressions
         [ExtraCategories(SyntaxKindCategory.UnaryExpression)]

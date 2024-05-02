@@ -9,7 +9,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 {
     internal sealed partial class Lexer : AbstractLexer, IDisposable
     {
-        private enum ValueKind
+        internal enum ValueKind
         {
             None = 0,
             String,
@@ -20,7 +20,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             Complex
         }
 
-        private struct TokenInfo
+        internal struct TokenInfo
         {
             // scanned values
             internal SyntaxKind Kind;

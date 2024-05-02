@@ -58,6 +58,15 @@ namespace Loretta.CodeAnalysis.Lua
         /// <summary>Called when the visitor visits a ExpressionListFunctionArgumentSyntax node.</summary>
         public virtual TResult? VisitExpressionListFunctionArgument(ExpressionListFunctionArgumentSyntax node) => this.DefaultVisit(node);
 
+        /// <summary>Called when the visitor visits a InterpolatedStringExpressionSyntax node.</summary>
+        public virtual TResult? VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node) => this.DefaultVisit(node);
+
+        /// <summary>Called when the visitor visits a InterpolatedStringTextSyntax node.</summary>
+        public virtual TResult? VisitInterpolatedStringText(InterpolatedStringTextSyntax node) => this.DefaultVisit(node);
+
+        /// <summary>Called when the visitor visits a InterpolationSyntax node.</summary>
+        public virtual TResult? VisitInterpolation(InterpolationSyntax node) => this.DefaultVisit(node);
+
         /// <summary>Called when the visitor visits a AnonymousFunctionExpressionSyntax node.</summary>
         public virtual TResult? VisitAnonymousFunctionExpression(AnonymousFunctionExpressionSyntax node) => this.DefaultVisit(node);
 
@@ -292,6 +301,15 @@ namespace Loretta.CodeAnalysis.Lua
         /// <summary>Called when the visitor visits a ExpressionListFunctionArgumentSyntax node.</summary>
         public virtual void VisitExpressionListFunctionArgument(ExpressionListFunctionArgumentSyntax node) => this.DefaultVisit(node);
 
+        /// <summary>Called when the visitor visits a InterpolatedStringExpressionSyntax node.</summary>
+        public virtual void VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node) => this.DefaultVisit(node);
+
+        /// <summary>Called when the visitor visits a InterpolatedStringTextSyntax node.</summary>
+        public virtual void VisitInterpolatedStringText(InterpolatedStringTextSyntax node) => this.DefaultVisit(node);
+
+        /// <summary>Called when the visitor visits a InterpolationSyntax node.</summary>
+        public virtual void VisitInterpolation(InterpolationSyntax node) => this.DefaultVisit(node);
+
         /// <summary>Called when the visitor visits a AnonymousFunctionExpressionSyntax node.</summary>
         public virtual void VisitAnonymousFunctionExpression(AnonymousFunctionExpressionSyntax node) => this.DefaultVisit(node);
 
@@ -525,6 +543,15 @@ namespace Loretta.CodeAnalysis.Lua
 
         public override SyntaxNode? VisitExpressionListFunctionArgument(ExpressionListFunctionArgumentSyntax node)
             => node.Update(VisitToken(node.OpenParenthesisToken), VisitList(node.Expressions), VisitToken(node.CloseParenthesisToken));
+
+        public override SyntaxNode? VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node)
+            => node.Update(VisitToken(node.StringStartToken), VisitList(node.Contents), VisitToken(node.StringEndToken));
+
+        public override SyntaxNode? VisitInterpolatedStringText(InterpolatedStringTextSyntax node)
+            => node.Update(VisitToken(node.TextToken));
+
+        public override SyntaxNode? VisitInterpolation(InterpolationSyntax node)
+            => node.Update(VisitToken(node.OpenBraceToken), (ExpressionSyntax?)Visit(node.Expression) ?? throw new ArgumentNullException("expression"), VisitToken(node.CloseBraceToken));
 
         public override SyntaxNode? VisitAnonymousFunctionExpression(AnonymousFunctionExpressionSyntax node)
             => node.Update(VisitToken(node.FunctionKeyword), (TypeParameterListSyntax?)Visit(node.TypeParameterList), (ParameterListSyntax?)Visit(node.Parameters) ?? throw new ArgumentNullException("parameters"), (TypeBindingSyntax?)Visit(node.TypeBinding), (StatementListSyntax?)Visit(node.Body) ?? throw new ArgumentNullException("body"), VisitToken(node.EndKeyword));
@@ -907,6 +934,39 @@ namespace Loretta.CodeAnalysis.Lua
         /// <summary>Creates a new ExpressionListFunctionArgumentSyntax instance.</summary>
         public static ExpressionListFunctionArgumentSyntax ExpressionListFunctionArgument(SeparatedSyntaxList<ExpressionSyntax> expressions = default)
             => SyntaxFactory.ExpressionListFunctionArgument(SyntaxFactory.Token(SyntaxKind.OpenParenthesisToken), expressions, SyntaxFactory.Token(SyntaxKind.CloseParenthesisToken));
+
+        public static InterpolatedStringExpressionSyntax InterpolatedStringExpression(SyntaxToken stringStartToken, SyntaxList<InterpolatedStringContentSyntax> contents, SyntaxToken stringEndToken)
+        {
+            if (stringStartToken.Kind() != SyntaxKind.InterpolatedStringStartToken) throw new ArgumentException($"Invalid kind provided. Expected InterpolatedStringStartToken but got {stringStartToken.Kind()}.", nameof(stringStartToken));
+            if (stringEndToken.Kind() != SyntaxKind.InterpolatedStringEndToken) throw new ArgumentException($"Invalid kind provided. Expected InterpolatedStringEndToken but got {stringEndToken.Kind()}.", nameof(stringEndToken));
+            return (InterpolatedStringExpressionSyntax)Syntax.InternalSyntax.SyntaxFactory.InterpolatedStringExpression((Syntax.InternalSyntax.SyntaxToken)stringStartToken.Node!, contents.Node.ToGreenList<Syntax.InternalSyntax.InterpolatedStringContentSyntax>(), (Syntax.InternalSyntax.SyntaxToken)stringEndToken.Node!).CreateRed();
+        }
+
+        /// <summary>Creates a new InterpolatedStringExpressionSyntax instance.</summary>
+        public static InterpolatedStringExpressionSyntax InterpolatedStringExpression(SyntaxList<InterpolatedStringContentSyntax> contents = default)
+            => SyntaxFactory.InterpolatedStringExpression(SyntaxFactory.Token(SyntaxKind.InterpolatedStringStartToken), contents, SyntaxFactory.Token(SyntaxKind.InterpolatedStringEndToken));
+
+        public static InterpolatedStringTextSyntax InterpolatedStringText(SyntaxToken textToken)
+        {
+            if (textToken.Kind() != SyntaxKind.InterpolatedStringTextToken) throw new ArgumentException($"Invalid kind provided. Expected InterpolatedStringTextToken but got {textToken.Kind()}.", nameof(textToken));
+            return (InterpolatedStringTextSyntax)Syntax.InternalSyntax.SyntaxFactory.InterpolatedStringText((Syntax.InternalSyntax.SyntaxToken)textToken.Node!).CreateRed();
+        }
+
+        /// <summary>Creates a new InterpolatedStringTextSyntax instance.</summary>
+        public static InterpolatedStringTextSyntax InterpolatedStringText()
+            => SyntaxFactory.InterpolatedStringText(SyntaxFactory.Token(SyntaxKind.InterpolatedStringTextToken));
+
+        public static InterpolationSyntax Interpolation(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+        {
+            if (openBraceToken.Kind() != SyntaxKind.OpenBraceToken) throw new ArgumentException($"Invalid kind provided. Expected OpenBraceToken but got {openBraceToken.Kind()}.", nameof(openBraceToken));
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (closeBraceToken.Kind() != SyntaxKind.CloseBraceToken) throw new ArgumentException($"Invalid kind provided. Expected CloseBraceToken but got {closeBraceToken.Kind()}.", nameof(closeBraceToken));
+            return (InterpolationSyntax)Syntax.InternalSyntax.SyntaxFactory.Interpolation((Syntax.InternalSyntax.SyntaxToken)openBraceToken.Node!, (Syntax.InternalSyntax.ExpressionSyntax)expression.Green, (Syntax.InternalSyntax.SyntaxToken)closeBraceToken.Node!).CreateRed();
+        }
+
+        /// <summary>Creates a new InterpolationSyntax instance.</summary>
+        public static InterpolationSyntax Interpolation(ExpressionSyntax expression)
+            => SyntaxFactory.Interpolation(SyntaxFactory.Token(SyntaxKind.OpenBraceToken), expression, SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
 
         /// <summary>
         /// Creates a new <see cref="AnonymousFunctionExpressionSyntax" /> node.

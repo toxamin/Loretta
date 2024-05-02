@@ -39,7 +39,9 @@ namespace Loretta.CodeAnalysis
         //       It appears that in all cases so far we considered isDefaultValue, and not about value being 
         //       arithmetic zero (especially when definition is ambiguous).
 
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         public const ConstantValue NotAvailable = null;
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
         public static ConstantValue Bad => ConstantValueBad.Instance;
         public static ConstantValue Nil => ConstantValueNil.Instance;

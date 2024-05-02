@@ -385,6 +385,56 @@
 
     <!-- Primary Expressions -->
 
+    <Node Name="InterpolatedStringExpressionSyntax" Base="ExpressionSyntax">
+        <Kind Name="InterpolatedStringExpression"/>
+        <Field Name="StringStartToken" Type="SyntaxToken">
+            <Kind Name="InterpolatedStringStartToken"/>
+            <PropertyComment>
+                <summary>The first part of an interpolated string, <c>$"</c> or <c>$@"</c> or <c>$"""</c></summary>
+            </PropertyComment>
+        </Field>
+        <Field Name="Contents" Type="SyntaxList&lt;InterpolatedStringContentSyntax&gt;" >
+            <PropertyComment>
+                <summary>List of parts of the interpolated string, each one is either a literal part or an interpolation.</summary>
+            </PropertyComment>
+        </Field>
+        <Field Name="StringEndToken" Type="SyntaxToken">
+            <Kind Name="InterpolatedStringEndToken"/>
+            <PropertyComment>
+                <summary>The closing quote of the interpolated string.</summary>
+            </PropertyComment>
+        </Field>
+    </Node>
+
+    <AbstractNode Name="InterpolatedStringContentSyntax" Base="LuaSyntaxNode" />
+    <Node Name="InterpolatedStringTextSyntax" Base="InterpolatedStringContentSyntax">
+        <Kind Name="InterpolatedStringText"/>
+        <Field Name="TextToken" Type="SyntaxToken">
+            <Kind Name="InterpolatedStringTextToken"/>
+            <PropertyComment>
+                <summary>The text contents of a part of the interpolated string.</summary>
+            </PropertyComment>
+        </Field>
+    </Node>
+    <Node Name="InterpolationSyntax" Base="InterpolatedStringContentSyntax">
+        <Kind Name="Interpolation"/>
+        <Field Name="OpenBraceToken" Type="SyntaxToken">
+            <Kind Name="OpenBraceToken"/>
+            <PropertyComment>
+                <summary>This is a single <c>{</c>.</summary>
+            </PropertyComment>
+        </Field>
+        <Field Name="Expression" Type="ExpressionSyntax"/>
+        <Field Name="CloseBraceToken" Type="SyntaxToken">
+            <Kind Name="CloseBraceToken"/>
+            <PropertyComment>
+                <summary>
+                    This is a single <c>}</c>.
+                </summary>
+            </PropertyComment>
+        </Field>
+    </Node>
+
     <Node Name="AnonymousFunctionExpressionSyntax" Base="ExpressionSyntax">
         <TypeComment>
             <summary>Represents an anonymous function expression.</summary>

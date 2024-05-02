@@ -1455,6 +1455,315 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         }
     }
 
+    internal sealed partial class InterpolatedStringExpressionSyntax : ExpressionSyntax
+    {
+        internal readonly SyntaxToken stringStartToken;
+        internal readonly GreenNode? contents;
+        internal readonly SyntaxToken stringEndToken;
+
+        internal InterpolatedStringExpressionSyntax(SyntaxKind kind, SyntaxToken stringStartToken, GreenNode? contents, SyntaxToken stringEndToken, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+          : base(kind, diagnostics, annotations)
+        {
+            this.SlotCount = 3;
+            this.AdjustFlagsAndWidth(stringStartToken);
+            this.stringStartToken = stringStartToken;
+            if (contents != null)
+            {
+                this.AdjustFlagsAndWidth(contents);
+                this.contents = contents;
+            }
+            this.AdjustFlagsAndWidth(stringEndToken);
+            this.stringEndToken = stringEndToken;
+        }
+
+        internal InterpolatedStringExpressionSyntax(SyntaxKind kind, SyntaxToken stringStartToken, GreenNode? contents, SyntaxToken stringEndToken)
+          : base(kind)
+        {
+            this.SlotCount = 3;
+            this.AdjustFlagsAndWidth(stringStartToken);
+            this.stringStartToken = stringStartToken;
+            if (contents != null)
+            {
+                this.AdjustFlagsAndWidth(contents);
+                this.contents = contents;
+            }
+            this.AdjustFlagsAndWidth(stringEndToken);
+            this.stringEndToken = stringEndToken;
+        }
+
+        /// <summary>The first part of an interpolated string, <c>$"</c> or <c>$@"</c> or <c>$"""</c></summary>
+        public SyntaxToken StringStartToken => this.stringStartToken;
+        /// <summary>List of parts of the interpolated string, each one is either a literal part or an interpolation.</summary>
+        public Loretta.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<InterpolatedStringContentSyntax> Contents => new Loretta.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<InterpolatedStringContentSyntax>(this.contents);
+        /// <summary>The closing quote of the interpolated string.</summary>
+        public SyntaxToken StringEndToken => this.stringEndToken;
+
+        internal override GreenNode? GetSlot(int index)
+            => index switch
+            {
+                0 => this.stringStartToken,
+                1 => this.contents,
+                2 => this.stringEndToken,
+                _ => null,
+            };
+
+        internal override SyntaxNode CreateRed(SyntaxNode? parent, int position) => new Lua.Syntax.InterpolatedStringExpressionSyntax(this, parent, position);
+
+        public override void Accept(LuaSyntaxVisitor visitor) => visitor.VisitInterpolatedStringExpression(this);
+        public override TResult Accept<TResult>(LuaSyntaxVisitor<TResult> visitor) => visitor.VisitInterpolatedStringExpression(this);
+
+        public InterpolatedStringExpressionSyntax Update(SyntaxToken stringStartToken, Loretta.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<InterpolatedStringContentSyntax> contents, SyntaxToken stringEndToken)
+        {
+            if (stringStartToken != this.StringStartToken || contents != this.Contents || stringEndToken != this.StringEndToken)
+            {
+                var newNode = SyntaxFactory.InterpolatedStringExpression(stringStartToken, contents, stringEndToken);
+                var diags = GetDiagnostics();
+                if (diags?.Length > 0)
+                    newNode = newNode.WithDiagnosticsGreen(diags);
+                var annotations = GetAnnotations();
+                if (annotations?.Length > 0)
+                    newNode = newNode.WithAnnotationsGreen(annotations);
+                return newNode;
+            }
+
+            return this;
+        }
+
+        internal override GreenNode SetDiagnostics(DiagnosticInfo[]? diagnostics)
+            => new InterpolatedStringExpressionSyntax(this.Kind, this.stringStartToken, this.contents, this.stringEndToken, diagnostics, GetAnnotations());
+
+        internal override GreenNode SetAnnotations(SyntaxAnnotation[]? annotations)
+            => new InterpolatedStringExpressionSyntax(this.Kind, this.stringStartToken, this.contents, this.stringEndToken, GetDiagnostics(), annotations);
+
+        internal InterpolatedStringExpressionSyntax(ObjectReader reader)
+          : base(reader)
+        {
+            this.SlotCount = 3;
+            var stringStartToken = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(stringStartToken);
+            this.stringStartToken = stringStartToken;
+            var contents = (GreenNode?)reader.ReadValue();
+            if (contents != null)
+            {
+                AdjustFlagsAndWidth(contents);
+                this.contents = contents;
+            }
+            var stringEndToken = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(stringEndToken);
+            this.stringEndToken = stringEndToken;
+        }
+
+        internal override void WriteTo(ObjectWriter writer)
+        {
+            base.WriteTo(writer);
+            writer.WriteValue(this.stringStartToken);
+            writer.WriteValue(this.contents);
+            writer.WriteValue(this.stringEndToken);
+        }
+
+        static InterpolatedStringExpressionSyntax()
+        {
+            ObjectBinder.RegisterTypeReader(typeof(InterpolatedStringExpressionSyntax), r => new InterpolatedStringExpressionSyntax(r));
+        }
+    }
+
+    internal abstract partial class InterpolatedStringContentSyntax : LuaSyntaxNode
+    {
+        internal InterpolatedStringContentSyntax(SyntaxKind kind, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+          : base(kind, diagnostics, annotations)
+        {
+        }
+
+        internal InterpolatedStringContentSyntax(SyntaxKind kind)
+          : base(kind)
+        {
+        }
+
+        protected InterpolatedStringContentSyntax(ObjectReader reader)
+          : base(reader)
+        {
+        }
+    }
+
+    internal sealed partial class InterpolatedStringTextSyntax : InterpolatedStringContentSyntax
+    {
+        internal readonly SyntaxToken textToken;
+
+        internal InterpolatedStringTextSyntax(SyntaxKind kind, SyntaxToken textToken, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+          : base(kind, diagnostics, annotations)
+        {
+            this.SlotCount = 1;
+            this.AdjustFlagsAndWidth(textToken);
+            this.textToken = textToken;
+        }
+
+        internal InterpolatedStringTextSyntax(SyntaxKind kind, SyntaxToken textToken)
+          : base(kind)
+        {
+            this.SlotCount = 1;
+            this.AdjustFlagsAndWidth(textToken);
+            this.textToken = textToken;
+        }
+
+        /// <summary>The text contents of a part of the interpolated string.</summary>
+        public SyntaxToken TextToken => this.textToken;
+
+        internal override GreenNode? GetSlot(int index)
+            => index == 0 ? this.textToken : null;
+
+        internal override SyntaxNode CreateRed(SyntaxNode? parent, int position) => new Lua.Syntax.InterpolatedStringTextSyntax(this, parent, position);
+
+        public override void Accept(LuaSyntaxVisitor visitor) => visitor.VisitInterpolatedStringText(this);
+        public override TResult Accept<TResult>(LuaSyntaxVisitor<TResult> visitor) => visitor.VisitInterpolatedStringText(this);
+
+        public InterpolatedStringTextSyntax Update(SyntaxToken textToken)
+        {
+            if (textToken != this.TextToken)
+            {
+                var newNode = SyntaxFactory.InterpolatedStringText(textToken);
+                var diags = GetDiagnostics();
+                if (diags?.Length > 0)
+                    newNode = newNode.WithDiagnosticsGreen(diags);
+                var annotations = GetAnnotations();
+                if (annotations?.Length > 0)
+                    newNode = newNode.WithAnnotationsGreen(annotations);
+                return newNode;
+            }
+
+            return this;
+        }
+
+        internal override GreenNode SetDiagnostics(DiagnosticInfo[]? diagnostics)
+            => new InterpolatedStringTextSyntax(this.Kind, this.textToken, diagnostics, GetAnnotations());
+
+        internal override GreenNode SetAnnotations(SyntaxAnnotation[]? annotations)
+            => new InterpolatedStringTextSyntax(this.Kind, this.textToken, GetDiagnostics(), annotations);
+
+        internal InterpolatedStringTextSyntax(ObjectReader reader)
+          : base(reader)
+        {
+            this.SlotCount = 1;
+            var textToken = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(textToken);
+            this.textToken = textToken;
+        }
+
+        internal override void WriteTo(ObjectWriter writer)
+        {
+            base.WriteTo(writer);
+            writer.WriteValue(this.textToken);
+        }
+
+        static InterpolatedStringTextSyntax()
+        {
+            ObjectBinder.RegisterTypeReader(typeof(InterpolatedStringTextSyntax), r => new InterpolatedStringTextSyntax(r));
+        }
+    }
+
+    internal sealed partial class InterpolationSyntax : InterpolatedStringContentSyntax
+    {
+        internal readonly SyntaxToken openBraceToken;
+        internal readonly ExpressionSyntax expression;
+        internal readonly SyntaxToken closeBraceToken;
+
+        internal InterpolationSyntax(SyntaxKind kind, SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+          : base(kind, diagnostics, annotations)
+        {
+            this.SlotCount = 3;
+            this.AdjustFlagsAndWidth(openBraceToken);
+            this.openBraceToken = openBraceToken;
+            this.AdjustFlagsAndWidth(expression);
+            this.expression = expression;
+            this.AdjustFlagsAndWidth(closeBraceToken);
+            this.closeBraceToken = closeBraceToken;
+        }
+
+        internal InterpolationSyntax(SyntaxKind kind, SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+          : base(kind)
+        {
+            this.SlotCount = 3;
+            this.AdjustFlagsAndWidth(openBraceToken);
+            this.openBraceToken = openBraceToken;
+            this.AdjustFlagsAndWidth(expression);
+            this.expression = expression;
+            this.AdjustFlagsAndWidth(closeBraceToken);
+            this.closeBraceToken = closeBraceToken;
+        }
+
+        /// <summary>This could is a single <c>{</c>.</summary>
+        public SyntaxToken OpenBraceToken => this.openBraceToken;
+        public ExpressionSyntax Expression => this.expression;
+        /// <summary>
+        /// This could be is a single <c>}</c>.
+        /// </summary>
+        public SyntaxToken CloseBraceToken => this.closeBraceToken;
+
+        internal override GreenNode? GetSlot(int index)
+            => index switch
+            {
+                0 => this.openBraceToken,
+                1 => this.expression,
+                2 => this.closeBraceToken,
+                _ => null,
+            };
+
+        internal override SyntaxNode CreateRed(SyntaxNode? parent, int position) => new Lua.Syntax.InterpolationSyntax(this, parent, position);
+
+        public override void Accept(LuaSyntaxVisitor visitor) => visitor.VisitInterpolation(this);
+        public override TResult Accept<TResult>(LuaSyntaxVisitor<TResult> visitor) => visitor.VisitInterpolation(this);
+
+        public InterpolationSyntax Update(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+        {
+            if (openBraceToken != this.OpenBraceToken || expression != this.Expression || closeBraceToken != this.CloseBraceToken)
+            {
+                var newNode = SyntaxFactory.Interpolation(openBraceToken, expression, closeBraceToken);
+                var diags = GetDiagnostics();
+                if (diags?.Length > 0)
+                    newNode = newNode.WithDiagnosticsGreen(diags);
+                var annotations = GetAnnotations();
+                if (annotations?.Length > 0)
+                    newNode = newNode.WithAnnotationsGreen(annotations);
+                return newNode;
+            }
+
+            return this;
+        }
+
+        internal override GreenNode SetDiagnostics(DiagnosticInfo[]? diagnostics)
+            => new InterpolationSyntax(this.Kind, this.openBraceToken, this.expression, this.closeBraceToken, diagnostics, GetAnnotations());
+
+        internal override GreenNode SetAnnotations(SyntaxAnnotation[]? annotations)
+            => new InterpolationSyntax(this.Kind, this.openBraceToken, this.expression, this.closeBraceToken, GetDiagnostics(), annotations);
+
+        internal InterpolationSyntax(ObjectReader reader)
+          : base(reader)
+        {
+            this.SlotCount = 3;
+            var openBraceToken = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(openBraceToken);
+            this.openBraceToken = openBraceToken;
+            var expression = (ExpressionSyntax)reader.ReadValue();
+            AdjustFlagsAndWidth(expression);
+            this.expression = expression;
+            var closeBraceToken = (SyntaxToken)reader.ReadValue();
+            AdjustFlagsAndWidth(closeBraceToken);
+            this.closeBraceToken = closeBraceToken;
+        }
+
+        internal override void WriteTo(ObjectWriter writer)
+        {
+            base.WriteTo(writer);
+            writer.WriteValue(this.openBraceToken);
+            writer.WriteValue(this.expression);
+            writer.WriteValue(this.closeBraceToken);
+        }
+
+        static InterpolationSyntax()
+        {
+            ObjectBinder.RegisterTypeReader(typeof(InterpolationSyntax), r => new InterpolationSyntax(r));
+        }
+    }
+
     /// <summary>Represents an anonymous function expression.</summary>
     internal sealed partial class AnonymousFunctionExpressionSyntax : ExpressionSyntax
     {
@@ -9124,6 +9433,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         public virtual TResult VisitStringFunctionArgument(StringFunctionArgumentSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitTableConstructorFunctionArgument(TableConstructorFunctionArgumentSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitExpressionListFunctionArgument(ExpressionListFunctionArgumentSyntax node) => this.DefaultVisit(node);
+        public virtual TResult VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node) => this.DefaultVisit(node);
+        public virtual TResult VisitInterpolatedStringText(InterpolatedStringTextSyntax node) => this.DefaultVisit(node);
+        public virtual TResult VisitInterpolation(InterpolationSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitAnonymousFunctionExpression(AnonymousFunctionExpressionSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitTableConstructorExpression(TableConstructorExpressionSyntax node) => this.DefaultVisit(node);
         public virtual TResult VisitLiteralExpression(LiteralExpressionSyntax node) => this.DefaultVisit(node);
@@ -9205,6 +9517,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         public virtual void VisitStringFunctionArgument(StringFunctionArgumentSyntax node) => this.DefaultVisit(node);
         public virtual void VisitTableConstructorFunctionArgument(TableConstructorFunctionArgumentSyntax node) => this.DefaultVisit(node);
         public virtual void VisitExpressionListFunctionArgument(ExpressionListFunctionArgumentSyntax node) => this.DefaultVisit(node);
+        public virtual void VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node) => this.DefaultVisit(node);
+        public virtual void VisitInterpolatedStringText(InterpolatedStringTextSyntax node) => this.DefaultVisit(node);
+        public virtual void VisitInterpolation(InterpolationSyntax node) => this.DefaultVisit(node);
         public virtual void VisitAnonymousFunctionExpression(AnonymousFunctionExpressionSyntax node) => this.DefaultVisit(node);
         public virtual void VisitTableConstructorExpression(TableConstructorExpressionSyntax node) => this.DefaultVisit(node);
         public virtual void VisitLiteralExpression(LiteralExpressionSyntax node) => this.DefaultVisit(node);
@@ -9313,6 +9628,15 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
         public override LuaSyntaxNode VisitExpressionListFunctionArgument(ExpressionListFunctionArgumentSyntax node)
             => node.Update((SyntaxToken)Visit(node.OpenParenthesisToken), VisitList(node.Expressions), (SyntaxToken)Visit(node.CloseParenthesisToken));
+
+        public override LuaSyntaxNode VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node)
+            => node.Update((SyntaxToken)Visit(node.StringStartToken), VisitList(node.Contents), (SyntaxToken)Visit(node.StringEndToken));
+
+        public override LuaSyntaxNode VisitInterpolatedStringText(InterpolatedStringTextSyntax node)
+            => node.Update((SyntaxToken)Visit(node.TextToken));
+
+        public override LuaSyntaxNode VisitInterpolation(InterpolationSyntax node)
+            => node.Update((SyntaxToken)Visit(node.OpenBraceToken), (ExpressionSyntax)Visit(node.Expression), (SyntaxToken)Visit(node.CloseBraceToken));
 
         public override LuaSyntaxNode VisitAnonymousFunctionExpression(AnonymousFunctionExpressionSyntax node)
             => node.Update((SyntaxToken)Visit(node.FunctionKeyword), (TypeParameterListSyntax)Visit(node.TypeParameterList), (ParameterListSyntax)Visit(node.Parameters), (TypeBindingSyntax)Visit(node.TypeBinding), (StatementListSyntax)Visit(node.Body), (SyntaxToken)Visit(node.EndKeyword));
@@ -9771,6 +10095,71 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             if (cached != null) return (ExpressionListFunctionArgumentSyntax)cached;
 
             var result = new ExpressionListFunctionArgumentSyntax(SyntaxKind.ExpressionListFunctionArgument, openParenthesisToken, expressions.Node, closeParenthesisToken);
+            if (hash >= 0)
+            {
+                SyntaxNodeCache.AddNode(result, hash);
+            }
+
+            return result;
+        }
+
+        public static InterpolatedStringExpressionSyntax InterpolatedStringExpression(SyntaxToken stringStartToken, Loretta.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<InterpolatedStringContentSyntax> contents, SyntaxToken stringEndToken)
+        {
+#if DEBUG
+            if (stringStartToken == null) throw new ArgumentNullException(nameof(stringStartToken));
+            if (stringStartToken.Kind != SyntaxKind.InterpolatedStringStartToken) throw new ArgumentException($"Invalid kind provided. Expected InterpolatedStringStartToken but got {stringStartToken.Kind}.", nameof(stringStartToken));
+            if (stringEndToken == null) throw new ArgumentNullException(nameof(stringEndToken));
+            if (stringEndToken.Kind != SyntaxKind.InterpolatedStringEndToken) throw new ArgumentException($"Invalid kind provided. Expected InterpolatedStringEndToken but got {stringEndToken.Kind}.", nameof(stringEndToken));
+#endif
+
+            int hash;
+            var cached = SyntaxNodeCache.TryGetNode((int)SyntaxKind.InterpolatedStringExpression, stringStartToken, contents.Node, stringEndToken, out hash);
+            if (cached != null) return (InterpolatedStringExpressionSyntax)cached;
+
+            var result = new InterpolatedStringExpressionSyntax(SyntaxKind.InterpolatedStringExpression, stringStartToken, contents.Node, stringEndToken);
+            if (hash >= 0)
+            {
+                SyntaxNodeCache.AddNode(result, hash);
+            }
+
+            return result;
+        }
+
+        public static InterpolatedStringTextSyntax InterpolatedStringText(SyntaxToken textToken)
+        {
+#if DEBUG
+            if (textToken == null) throw new ArgumentNullException(nameof(textToken));
+            if (textToken.Kind != SyntaxKind.InterpolatedStringTextToken) throw new ArgumentException($"Invalid kind provided. Expected InterpolatedStringTextToken but got {textToken.Kind}.", nameof(textToken));
+#endif
+
+            int hash;
+            var cached = SyntaxNodeCache.TryGetNode((int)SyntaxKind.InterpolatedStringText, textToken, out hash);
+            if (cached != null) return (InterpolatedStringTextSyntax)cached;
+
+            var result = new InterpolatedStringTextSyntax(SyntaxKind.InterpolatedStringText, textToken);
+            if (hash >= 0)
+            {
+                SyntaxNodeCache.AddNode(result, hash);
+            }
+
+            return result;
+        }
+
+        public static InterpolationSyntax Interpolation(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+        {
+#if DEBUG
+            if (openBraceToken == null) throw new ArgumentNullException(nameof(openBraceToken));
+            if (openBraceToken.Kind != SyntaxKind.OpenBraceToken) throw new ArgumentException($"Invalid kind provided. Expected OpenBraceToken but got {openBraceToken.Kind}.", nameof(openBraceToken));
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (closeBraceToken == null) throw new ArgumentNullException(nameof(closeBraceToken));
+            if (closeBraceToken.Kind != SyntaxKind.CloseBraceToken) throw new ArgumentException($"Invalid kind provided. Expected CloseBraceToken but got {closeBraceToken.Kind}.", nameof(closeBraceToken));
+#endif
+
+            int hash;
+            var cached = SyntaxNodeCache.TryGetNode((int)SyntaxKind.Interpolation, openBraceToken, expression, closeBraceToken, out hash);
+            if (cached != null) return (InterpolationSyntax)cached;
+
+            var result = new InterpolationSyntax(SyntaxKind.Interpolation, openBraceToken, expression, closeBraceToken);
             if (hash >= 0)
             {
                 SyntaxNodeCache.AddNode(result, hash);
@@ -11316,6 +11705,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 typeof(StringFunctionArgumentSyntax),
                 typeof(TableConstructorFunctionArgumentSyntax),
                 typeof(ExpressionListFunctionArgumentSyntax),
+                typeof(InterpolatedStringExpressionSyntax),
+                typeof(InterpolatedStringTextSyntax),
+                typeof(InterpolationSyntax),
                 typeof(AnonymousFunctionExpressionSyntax),
                 typeof(TableConstructorExpressionSyntax),
                 typeof(LiteralExpressionSyntax),
