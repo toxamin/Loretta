@@ -215,5 +215,17 @@ namespace Loretta.CodeAnalysis.Lua.Utilities
                 return $"\\x{byte01:X2}\\x{byte02:X2}\\x{byte03:X2}";
             }
         }
+        
+        
+        public static string CharToString(char ch)
+        {
+            return ch switch
+            {
+                '\t' => @"\t",
+                '\v' => @"\v",
+                '\f' => @"\f",
+                _ => @$"\u{(int)ch:x4}",
+            };
+        }
     }
 }

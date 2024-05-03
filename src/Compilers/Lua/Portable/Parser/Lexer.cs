@@ -156,6 +156,11 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
                     token = SyntaxFactory.HashLiteral(leadingNode, info.Text, info.UIntValue, trailingNode);
                     break;
+                
+                case SyntaxKind.InterpolatedStringToken:
+                    // we do not record a separate "value" for an interpolated string token, as it must be rescanned during parsing.
+                    token = SyntaxFactory.Literal(leadingNode, info.Text!, info.Kind, info.Text!, trailingNode);
+                    break;
 
                 case SyntaxKind.EndOfFileToken:
                     LorettaDebug.Assert(info.Text is null);
@@ -583,7 +588,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
                     if (_options.SyntaxOptions.AcceptInterpolatedStrings) {
                         // TODO: Implement interpolated strings
-                        
+                        TryScanInterpolatedString(ref info);
                     } else {
                         info.Kind = SyntaxKind.HashStringLiteralToken;
                         var stringValue = ParseShortString();
@@ -691,6 +696,13 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                     AddError(ErrorCode.ERR_BadCharacter, info.Text);
                     break;
             } // end switch
+        }
+        
+        private bool TryScanInterpolatedString(ref TokenInfo info)
+        {
+            LorettaDebug.Assert(TextWindow.PeekChar() == '`');
+            this.ScanInterpolatedStringLiteral(ref info);
+            return true;
         }
 
         private int ConsumeCharSequence(char ch)

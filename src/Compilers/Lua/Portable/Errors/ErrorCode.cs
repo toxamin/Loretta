@@ -38,6 +38,7 @@
         ERR_NumberSuffixNotSupportedInVersion = 30,
         ERR_LuajitSuffixInFloat = 31,
         ERR_Lua51NestingInLongString = 32,
+        ERR_UnclosedExpressionHole = 33,
 
         // Parser Errors
         ERR_IdentifierExpectedKW = 1000,

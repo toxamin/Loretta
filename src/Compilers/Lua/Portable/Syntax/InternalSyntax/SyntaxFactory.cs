@@ -104,6 +104,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                    ? Token(leading, kind, trailing)
                    : SyntaxToken.WithValue(kind, leading, text, valueText, trailing);
         }
+        
+        internal static SyntaxToken Token(GreenNode? leading, SyntaxKind kind, string text, GreenNode? trailing) => 
+            Token(leading, kind, text, text, trailing);
 
         internal static SyntaxToken MissingToken(SyntaxKind kind) =>
             SyntaxToken.CreateMissing(kind, null, null);
@@ -133,6 +136,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
         internal static SyntaxToken Literal(GreenNode? leading, string text, string value, GreenNode? trailing) =>
             SyntaxToken.WithValue(SyntaxKind.StringLiteralToken, leading, text, value, trailing);
+        
+        internal static SyntaxToken Literal(GreenNode? leading, string text, SyntaxKind kind, string value, GreenNode? trailing) => 
+            SyntaxToken.WithValue(kind, leading, text, value, trailing);
 
         internal static SyntaxToken HashLiteral(GreenNode? leading, string text, uint value, GreenNode? trailing) =>
             SyntaxToken.WithValue(SyntaxKind.HashStringLiteralToken, leading, text, value, trailing);

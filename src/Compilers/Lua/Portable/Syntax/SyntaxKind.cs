@@ -544,7 +544,9 @@ namespace Loretta.CodeAnalysis.Lua
         [ExtraCategories(SyntaxKindCategory.LiteralToken)]
         [Property(SyntaxKindProperty.LiteralExpression, HashStringLiteralExpression)]
         HashStringLiteralToken = 1004,
+        [Token]
         InterpolatedStringToken = 1005,
+        [Token]
         InterpolatedStringTextToken = 1006,
 
         // Big gap 1005-2000 (insert new tokens with text here)

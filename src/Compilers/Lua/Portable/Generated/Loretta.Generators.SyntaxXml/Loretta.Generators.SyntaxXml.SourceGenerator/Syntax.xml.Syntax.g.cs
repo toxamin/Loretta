@@ -860,13 +860,13 @@ namespace Loretta.CodeAnalysis.Lua.Syntax
         {
         }
 
-        /// <summary>This could is a single <c>{</c>.</summary>
+        /// <summary>This is a single <c>{</c>.</summary>
         public SyntaxToken OpenBraceToken => new SyntaxToken(this, ((Syntax.InternalSyntax.InterpolationSyntax)this.Green).openBraceToken, Position, 0);
 
         public ExpressionSyntax Expression => GetRed(ref this.expression, 1)!;
 
         /// <summary>
-        /// This could be is a single <c>}</c>.
+        /// This is a single <c>}</c>.
         /// </summary>
         public SyntaxToken CloseBraceToken => new SyntaxToken(this, ((Syntax.InternalSyntax.InterpolationSyntax)this.Green).closeBraceToken, GetChildPosition(2), GetChildIndex(2));
 

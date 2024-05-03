@@ -119,6 +119,11 @@ namespace Loretta.CLI
             foreach (var fileInfo in di.EnumerateFiles())
                 s_logger.WriteLine($"./{fileInfo.Name}");
         }
+        
+        public static void PrintWorkingDirectory()
+        {
+            s_logger.WriteLine(Environment.CurrentDirectory);
+        }
 
         #endregion Current Directory Management
 
@@ -555,6 +560,11 @@ namespace Loretta.CLI
             {
                 Handler = CommandHandler.Create(ListSymbols)
             };
+            
+            var printWorkingDirectoryCommand = new Command("pwd", "List the current directory's symbols.")
+            {
+                Handler = CommandHandler.Create(PrintWorkingDirectory)
+            };
 
             var lexCommand = new Command("l", "Lexes the provided file.")
             {
@@ -688,6 +698,7 @@ namespace Loretta.CLI
                 quitCommand,
                 changeDirectoryCommand,
                 listSymbolsCommand,
+                printWorkingDirectoryCommand,
                 lexCommand,
                 parseCommand,
                 parseExpressionCommand,

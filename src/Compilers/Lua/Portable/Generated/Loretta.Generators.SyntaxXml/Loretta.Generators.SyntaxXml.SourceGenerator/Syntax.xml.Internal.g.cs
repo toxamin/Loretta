@@ -1690,11 +1690,11 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             this.closeBraceToken = closeBraceToken;
         }
 
-        /// <summary>This could is a single <c>{</c>.</summary>
+        /// <summary>This is a single <c>{</c>.</summary>
         public SyntaxToken OpenBraceToken => this.openBraceToken;
         public ExpressionSyntax Expression => this.expression;
         /// <summary>
-        /// This could be is a single <c>}</c>.
+        /// This is a single <c>}</c>.
         /// </summary>
         public SyntaxToken CloseBraceToken => this.closeBraceToken;
 

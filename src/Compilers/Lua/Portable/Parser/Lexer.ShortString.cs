@@ -8,7 +8,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         {
             _builder.Clear();
             var delim = TextWindow.NextChar();
-            LorettaDebug.Assert(delim is '"' or '\'' or '`');
+            LorettaDebug.Assert(delim is '"' or '\'');
 
             char ch;
             while (!IsAtEnd(ch = TextWindow.PeekChar()) && ch != delim)

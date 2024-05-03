@@ -1025,6 +1025,8 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.IdentifierToken:
                 case SyntaxKind.IfKeyword:
                 case SyntaxKind.InKeyword:
+                case SyntaxKind.InterpolatedStringTextToken:
+                case SyntaxKind.InterpolatedStringToken:
                 case SyntaxKind.LessThanEqualsToken:
                 case SyntaxKind.LessThanLessThanToken:
                 case SyntaxKind.LessThanToken:

@@ -875,6 +875,8 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 SyntaxKind.FunctionKeyword when PeekToken(1).Kind is SyntaxKind.OpenParenthesisToken
                                                                   or SyntaxKind.LessThanToken => ParseAnonymousFunctionExpression(),
                 SyntaxKind.IfKeyword => ParseIfExpression(),
+                SyntaxKind.InterpolatedStringToken => this.ParseInterpolatedStringToken(),
+                SyntaxKind.InterpolatedStringStartToken => throw new NotImplementedException(),
                 _ => ParsePrefixOrVariableExpression(),
             };
 
