@@ -174,7 +174,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             // will be used to parse out the expression of the interpolation.
             //
             // The parsing of the open brace, close brace and colon is specially handled in ParseInterpolation below.
-            var followingRange = interpolation.HasColon ? interpolation.ColonRange : interpolation.CloseBraceRange;
+            var followingRange = interpolation.CloseBraceRange;
             var expressionText = text[interpolation.OpenBraceRange.End..followingRange.Start];
 
             using var tempLexer = new Lexer(SourceText.From(expressionText), options);
@@ -239,15 +239,14 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         {
             // For a normal/verbatim piece of content, process the inner content as if it was in a corresponding
             // *non*-interpolated string to get the correct meaning of all the escapes/diagnostics within.
-            var prefix = "\"";
-            var fakeString = prefix + text.Replace("\"", "\\\"") + "\"";
-            using var tempLexer = new Lexer(SourceText.From(fakeString), this.Options);
-            // var mode = LexerMode.Syntax;
-            var token = tempLexer.Lex();//(ref mode);
+            var prefix = "`";
+            var fakeString = prefix + "`";
+            using var tempLexer = new Lexer(SourceText.From(fakeString), this.Options, isInterpolatedReparsing: true);
+            var token = tempLexer.Lex();
             Debug.Assert(token.Kind == SyntaxKind.StringLiteralToken);
             var result = SyntaxFactory.Literal(leading: null, text, SyntaxKind.InterpolatedStringTextToken, token.ValueText!, trailing: null);
             if (token.ContainsDiagnostics)
-                result = result.WithDiagnosticsGreen(MoveDiagnostics(token.GetDiagnostics(), -prefix.Length)); // this will actually be wrong in our case...
+                result = result.WithDiagnosticsGreen(MoveDiagnostics(token.GetDiagnostics(), -prefix.Length));
 
             return result;
         }

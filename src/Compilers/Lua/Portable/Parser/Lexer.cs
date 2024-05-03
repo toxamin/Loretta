@@ -42,6 +42,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         private readonly SyntaxListBuilder _leadingTriviaCache = new(10);
         private readonly SyntaxListBuilder _trailingTriviaCache = new(10);
         private int _badTokenCount; // cumulative count of bad tokens produced
+        private readonly bool _isInterpolatedReparsing;
 
         private static int GetFullWidth(SyntaxListBuilder builder)
         {
@@ -56,6 +57,16 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         {
             LorettaDebug.Assert(options is not null);
             _options = options;
+            _createWhitespaceTriviaFunction = CreateWhitespaceTrivia;
+            _createQuickTokenFunction = CreateQuickToken;
+        }
+        
+        public Lexer(SourceText text, LuaParseOptions options, bool isInterpolatedReparsing)
+            : base(text)
+        {
+            LorettaDebug.Assert(options is not null);
+            _options = options;
+            _isInterpolatedReparsing = isInterpolatedReparsing;
             _createWhitespaceTriviaFunction = CreateWhitespaceTrivia;
             _createQuickTokenFunction = CreateQuickToken;
         }
@@ -585,10 +596,18 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
                 case '`':
                 {
-
                     if (_options.SyntaxOptions.AcceptInterpolatedStrings) {
-                        // TODO: Implement interpolated strings
-                        TryScanInterpolatedString(ref info);
+                        if (_isInterpolatedReparsing)
+                        {
+                            info.Kind = SyntaxKind.StringLiteralToken;
+                            info.ValueKind = ValueKind.String;
+                            info.StringValue = ParseShortString();
+                            info.Text = TextWindow.GetText(intern: true);
+                        }
+                        else
+                        {
+                            TryScanInterpolatedString(ref info);
+                        }
                     } else {
                         info.Kind = SyntaxKind.HashStringLiteralToken;
                         var stringValue = ParseShortString();

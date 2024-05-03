@@ -190,11 +190,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                             // strings it's just a backslash.
                             
                             // var escapeStart = _lexer.TextWindow.Position;
-                            // char ch = _lexer.ScanEscapeSequence(surrogateCharacter: out _);
-
-                            throw new NotImplementedException();
-                            
-
+                            var _ = _lexer.ParseEscapeSequence(true, true)!;
                             continue;
 
                         default:
@@ -234,7 +230,6 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
                 interpolations?.Add(new Interpolation(
                     new Range(openBracePosition, openBracePosition + 1),
-                    colonRange,
                     new Range(closeBracePosition, _lexer.TextWindow.Position)));
                 
             }
