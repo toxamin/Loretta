@@ -618,7 +618,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                         info.Text = TextWindow.GetText(intern: true);
 
                         if (!_options.SyntaxOptions.AcceptHashStrings)
-                            AddError(ErrorCode.ERR_HashStringsNotSupportedInVersion);
+                            AddError(ErrorCode.ERR_BackTickStringNotSupportedInVersion);
                     }
 
                     return;

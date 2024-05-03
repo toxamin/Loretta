@@ -110,6 +110,8 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Lexical
             untestedTokenKinds.Remove(SyntaxKind.BadToken);
             untestedTokenKinds.Remove(SyntaxKind.EndOfFileToken);
             untestedTokenKinds.Remove(SyntaxKind.SkippedTokensTrivia);
+            untestedTokenKinds.Remove(SyntaxKind.InterpolatedStringToken);
+            untestedTokenKinds.Remove(SyntaxKind.InterpolatedStringTextToken);
 
             var manufacturedKinds = tokenKinds.Where(kind =>
                 LuaSyntaxOptions.AllPresets.All(preset =>
@@ -126,6 +128,8 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Lexical
         [MemberData(nameof(GetTokensData))]
         public void Lexer_Lexes_Token(LuaSyntaxOptions options, ShortToken expectedToken)
         {
+            if (expectedToken.Kind == SyntaxKind.HashStringLiteralToken && options.AcceptInterpolatedStrings)
+                return;
             var token = LexToken(expectedToken.Text, options);
             Assert.Equal(expectedToken.Kind, token.Kind());
             Assert.Equal(expectedToken.Text, token.Text);

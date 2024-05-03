@@ -161,8 +161,8 @@
   <data name="ERR_ExpressionExpected" xml:space="preserve">
     <value>Expression expected</value>
   </data>
-  <data name="ERR_HashStringsNotSupportedInVersion" xml:space="preserve">
-    <value>Hash strings are not supported in this lua version</value>
+  <data name="ERR_BackTickStringNotSupportedInVersion" xml:space="preserve">
+    <value>This Lua version does not support interpolated strings nor hash strings</value>
   </data>
   <data name="ERR_HexDigitExpected" xml:space="preserve">
     <value>Hexadecimal digit expected</value>
@@ -207,6 +207,12 @@
   </data>
   <data name="ERR_InvalidStringEscape" xml:space="preserve">
     <value>Invalid string escape</value>
+  </data>
+  <data name="ERR_DoubleBracesNotAllowed" xml:space="preserve">
+    <value>Double braces are not permitted within interpolated strings</value>
+  </data>
+  <data name="ERR_UnclosedExpressionHole" xml:space="preserve">
+    <value>Unclosed expression hole</value>
   </data>
   <data name="ERR_LbraceExpected" xml:space="preserve">
     <value>{ expected</value>

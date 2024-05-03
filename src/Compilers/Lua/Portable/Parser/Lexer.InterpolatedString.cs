@@ -36,32 +36,6 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         }
 
         /// <summary>
-        /// Turn a (parsed) interpolated string nonterminal into an interpolated string token.
-        /// </summary>
-        /// <param name="interpolatedString"></param>
-        internal static SyntaxToken RescanInterpolatedString(InterpolatedStringExpressionSyntax interpolatedString)
-        {
-            var text = interpolatedString.ToString();
-            var kind = SyntaxKind.InterpolatedStringToken;
-            // TODO: scan the contents (perhaps using ScanInterpolatedStringLiteralContents) to reconstruct any lexical
-            // errors such as // inside an expression hole
-            return SyntaxFactory.Literal(
-                interpolatedString.GetFirstToken()!.GetLeadingTrivia(),
-                text,
-                kind,
-                text,
-                interpolatedString.GetLastToken()!.GetTrailingTrivia());
-        }
-
-        internal enum InterpolatedStringKind
-        {
-            /// <summary>
-            /// Normal interpolated string that just starts with <c>$"</c>
-            /// </summary>
-            Normal,
-        }
-
-        /// <summary>
         /// Non-copyable ref-struct so that this will only live on the stack for the lifetime of the lexer/parser
         /// recursing to process interpolated strings.
         /// </summary>
@@ -159,12 +133,6 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             }
             private void ScanInterpolatedStringLiteralContents(ArrayBuilder<Interpolation>? interpolations)
             {
-                // Check for the trivial multi-line raw string literal of the form:
-                //
-                // $"""
-                //  """
-                //
-                // And give the special message that a content line is required in the literal.
 
                 while (true)
                 {
@@ -183,13 +151,13 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                             HandleCloseBraceInContent();
                             continue;
                         case '{':
+                            if (_lexer.TextWindow.PeekChar(1) == '{')
+                            {
+                                TrySetError(_lexer.MakeError(_lexer.TextWindow.Position, 2, ErrorCode.ERR_DoubleBracesNotAllowed));
+                            }
                             HandleOpenBraceInContent(interpolations);
                             continue;
                         case '\\':
-                            // In a normal interpolated string a backslash starts an escape. In all other interpolated
-                            // strings it's just a backslash.
-                            
-                            // var escapeStart = _lexer.TextWindow.Position;
                             var _ = _lexer.ParseEscapeSequence(true, true)!;
                             continue;
 
@@ -201,24 +169,14 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 }
             }
             
-            private void HandleCloseBraceInContent()
-            {
-                var pos = _lexer.TextWindow.Position;
-                _lexer.TextWindow.AdvanceChar();
-            }
-
+            private void HandleCloseBraceInContent() => _lexer.TextWindow.AdvanceChar();
+            
             private void HandleOpenBraceInContent(ArrayBuilder<Interpolation>? interpolations)
             {
-                HandleOpenBraceInNormalOrVerbatimContent(interpolations);
-            }
-
-            private void HandleOpenBraceInNormalOrVerbatimContent(ArrayBuilder<Interpolation>? interpolations)
-            {
-                
-                int openBracePosition = _lexer.TextWindow.Position;
+                var openBracePosition = _lexer.TextWindow.Position;
                 _lexer.TextWindow.AdvanceChar();
-                ScanInterpolatedStringLiteralHoleBalancedText('}', isHole: true, out var colonRange);
-                int closeBracePosition = _lexer.TextWindow.Position;
+                ScanInterpolatedStringLiteralHoleBalancedText('}');
+                var closeBracePosition = _lexer.TextWindow.Position;
                 if (_lexer.TextWindow.PeekChar() == '}')
                 {
                     _lexer.TextWindow.AdvanceChar();
@@ -231,18 +189,16 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 interpolations?.Add(new Interpolation(
                     new Range(openBracePosition, openBracePosition + 1),
                     new Range(closeBracePosition, _lexer.TextWindow.Position)));
-                
             }
             
             /// <summary>
             /// Scan past the hole inside an interpolated string literal, leaving the current character on the '}' (if any)
             /// </summary>
-            private void ScanInterpolatedStringLiteralHoleBalancedText(char endingChar, bool isHole, out Range colonRange)
+            private void ScanInterpolatedStringLiteralHoleBalancedText(char endingChar)
             {
-                colonRange = default;
                 while (true)
                 {
-                    char ch = _lexer.TextWindow.PeekChar();
+                    var ch = _lexer.TextWindow.PeekChar();
 
                     // Note: within a hole newlines are always allowed.  The restriction on if newlines are allowed or not
                     // is only within a text-portion of the interpolated string.
@@ -272,37 +228,23 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                             TrySetError(_lexer.MakeError(_lexer.TextWindow.Position, 1, ErrorCode.ERR_SyntaxError, endingChar.ToString()));
                             goto default;
                         case '"':
-                            // if (RecoveringFromRunawayLexing())
-                            // {
-                            //     // When recovering from mismatched delimiters, we consume the next
-                            //     // quote character as the close quote for the interpolated string. In
-                            //     // practice this gets us out of trouble in scenarios we've encountered.
-                            //     // See, for example, https://github.com/dotnet/roslyn/issues/44789
-                            //     return;
-                            // }
-
+                        case '\'':
                             // handle string literal inside an expression hole.
                             _lexer.ParseShortString();
                             continue;
-                        case '\'':
-                            // handle character literal inside an expression hole.
-                            _lexer.ParseShortString();
-                            continue;
                         case '[':
-                            if (_lexer.ConsumeLongString(true, out var _, out var _))
+                            if (_lexer.ConsumeLongString(true, out _, out _))
                             {
                                 continue;
                             }
                             _lexer.TextWindow.AdvanceChar();
                             continue;
-                            
                         
                         case '-':
                             if (_lexer.TextWindow.PeekChar(1) == '-')
                             {
                                 _lexer.TextWindow.AdvanceChar(2);
-
-                                if (!_lexer.ConsumeLongString(false, out _, out var closingNotFound))
+                                if (!_lexer.ConsumeLongString(false, out _, out _))
                                     _lexer.ScanToEndOfLine();
                                 continue;
                             }
@@ -317,7 +259,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                             }
                             else if (ch == '*')
                             {
-                                _lexer.ScanMultiLineCComment(out var isTerminated);
+                                _lexer.ScanMultiLineCComment(out _);
                                 continue;
                             }
                             
@@ -334,18 +276,11 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 }
             }
 
-            /// <summary>
-            /// The lexer can run away consuming the rest of the input when delimiters are mismatched. This is a test
-            /// for when we are attempting to recover from that situation.  Note that just running into new lines will
-            /// not make us think we're in runaway lexing.
-            /// </summary>
-            private bool RecoveringFromRunawayLexing() => Error != null;
-
             private void ScanInterpolatedStringLiteralHoleBracketed(char start, char end)
             {
                 LorettaDebug.Assert(start == _lexer.TextWindow.PeekChar());
                 _lexer.TextWindow.AdvanceChar();
-                ScanInterpolatedStringLiteralHoleBalancedText(end, isHole: false, colonRange: out _);
+                ScanInterpolatedStringLiteralHoleBalancedText(end);
                 if (_lexer.TextWindow.PeekChar() == end)
                 {
                     _lexer.TextWindow.AdvanceChar();

@@ -34,7 +34,7 @@
         ERR_EscapeTooLarge = 26,
         ERR_HexDigitExpected = 27,
         ERR_UnicodeEscapesNotSupportedLuaInVersion = 28,
-        ERR_HashStringsNotSupportedInVersion = 29,
+        ERR_BackTickStringNotSupportedInVersion = 29,
         ERR_NumberSuffixNotSupportedInVersion = 30,
         ERR_LuajitSuffixInFloat = 31,
         ERR_Lua51NestingInLongString = 32,
@@ -64,6 +64,7 @@
         ERR_ContinueNotSupportedInLuaVersion = 1019,
         ERR_GotoNotSupportedInLuaVersion = 1020,
         ERR_LocalVariableAttributesNotSupportedInLuaVersion = 1021,
+        ERR_DoubleBracesNotAllowed = 1022,
 
         // MessageProvider stuff
         ERR_BadDocumentationMode = 2000,

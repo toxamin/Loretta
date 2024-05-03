@@ -29,6 +29,8 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests
                 SyntaxKind.StringLiteralToken,
                 SyntaxKind.IdentifierToken,
                 SyntaxKind.HashStringLiteralToken,
+                SyntaxKind.InterpolatedStringToken,
+                SyntaxKind.InterpolatedStringTextToken
             };
 
             foreach (var kind in kinds)

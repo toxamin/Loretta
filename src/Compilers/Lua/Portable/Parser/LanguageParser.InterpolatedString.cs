@@ -4,9 +4,7 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using Loretta.CodeAnalysis.Lua.Utilities;
 using Loretta.CodeAnalysis.PooledObjects;
 using Loretta.CodeAnalysis.Text;
 
@@ -36,8 +34,8 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             // The substitution will end up being invisible to external APIs and clients such as the IDE, as
             // they have no way to ask for the stream of tokens before parsing.
 
-            Debug.Assert(this.CurrentToken.Kind == SyntaxKind.InterpolatedStringToken);
-            var originalToken = this.EatToken();
+            Debug.Assert(CurrentToken.Kind == SyntaxKind.InterpolatedStringToken);
+            var originalToken = EatToken();
 
             var originalText = originalToken.ValueText!; // this is actually the source text
             var originalTextSpan = originalText.AsSpan();
@@ -49,16 +47,13 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
             rescanInterpolation(out var error, out var openQuoteRange, interpolations, out var closeQuoteRange);
 
-            // Only bother trying to do dedentation if we have a multiline literal without errors.  There's no point
-            // trying in the presence of errors as we may not even be able to determine what the dedentation should be.
-
             var result = SyntaxFactory.InterpolatedStringExpression(getOpenQuote(), getContent(originalTextSpan), getCloseQuote());
 
             interpolations.Free();
             if (error != null)
             {
                 // Errors are positioned relative to the start of the token that was lexed.  Specifically relative to
-                // the starting `$` or `@`.  However, when placed on a node like this, it will be relative to the node's
+                // the starting '`'.  However, when placed on a node like this, it will be relative to the node's
                 // full start.  So we have to adjust the diagnostics taking that into account.
                 result = result.WithDiagnosticsGreen(MoveDiagnostics(new[] { error }, originalToken.GetLeadingTrivia()?.FullWidth ?? 0));
             }
@@ -68,7 +63,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
             void rescanInterpolation(out SyntaxDiagnosticInfo? error, out Range openQuoteRange, ArrayBuilder<Lexer.Interpolation> interpolations, out Range closeQuoteRange)
             {
-                using var tempLexer = new Lexer(SourceText.From(originalText), this.Options);
+                using var tempLexer = new Lexer(SourceText.From(originalText), Options);
                 var info = default(Lexer.TokenInfo);
                 tempLexer.ScanInterpolatedStringLiteralTop(ref info, out error, out openQuoteRange, interpolations, out closeQuoteRange);
             }
@@ -87,18 +82,14 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
                 var content = PooledStringBuilder.GetInstance();
                 var builder = _pool.Allocate<InterpolatedStringContentSyntax>();
 
-                ReadOnlySpan<char> indentationWhitespace = default;
-
                 var currentContentStart = openQuoteRange.End;
-                for (var i = 0; i < interpolations.Count; i++)
+                foreach (var interpolation in interpolations)
                 {
-                    var interpolation = interpolations[i];
-
                     // Add a token for text preceding the interpolation
                     builder.Add(makeContent(originalTextSpan[currentContentStart..interpolation.OpenBraceRange.Start])!);
 
                     // Now parse the interpolation itself.
-                    var interpolationNode = ParseInterpolation(this.Options, originalText, interpolation);
+                    var interpolationNode = ParseInterpolation(Options, originalText, interpolation);
 
                     // Make sure the interpolation starts at the right location.
 
@@ -124,40 +115,13 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
             SyntaxToken getCloseQuote()
             {
-                // Make a token for the close quote " (even if it was missing)
+                // Make a token for the close quote ` (even if it was missing)
                 return TokenOrMissingToken(
                     leading: null,
                     SyntaxKind.InterpolatedStringEndToken,
                     originalText[closeQuoteRange],
                     originalToken.GetTrailingTrivia());
             }
-            
-        }
-
-        private static bool CheckForSpaceDifference(
-            ReadOnlySpan<char> currentLineWhitespace,
-            ReadOnlySpan<char> indentationLineWhitespace,
-            [NotNullWhen(true)] out string? currentLineMessage,
-            [NotNullWhen(true)] out string? indentationLineMessage)
-        {
-            for (int i = 0, n = Math.Min(currentLineWhitespace.Length, indentationLineWhitespace.Length); i < n; i++)
-            {
-                var currentLineChar = currentLineWhitespace[i];
-                var indentationLineChar = indentationLineWhitespace[i];
-
-                if (currentLineChar != indentationLineChar &&
-                    CharUtils.IsWhitespace(currentLineChar) &&
-                    CharUtils.IsWhitespace(indentationLineChar))
-                {
-                    currentLineMessage = CharUtils.CharToString(currentLineChar);
-                    indentationLineMessage = CharUtils.CharToString(indentationLineChar);
-                    return true;
-                }
-            }
-
-            currentLineMessage = null;
-            indentationLineMessage = null;
-            return false;
         }
 
         private static SyntaxToken TokenOrMissingToken(GreenNode? leading, SyntaxKind kind, string text, GreenNode? trailing)
@@ -209,14 +173,14 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
 
             ExpressionSyntax getExpressionAndAlignment()
             {
-                var expression = this.ParseExpression();
+                var expression = ParseExpression();
 
-                return this.ConsumeUnexpectedTokens(expression);
+                return ConsumeUnexpectedTokens(expression);
             }
 
             SyntaxToken getFormatAndCloseBrace()
             {
-                var leading = this.CurrentToken.GetLeadingTrivia();
+                var leading = CurrentToken.GetLeadingTrivia();
                 return getInterpolationCloseToken(leading);
             }
 
@@ -234,19 +198,17 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         /// Interpret the given raw text from source as an InterpolatedStringTextToken.
         /// </summary>
         /// <param name="text">The text for the full string literal, including the quotes and contents</param>
-        /// <param name="kind">The kind of the interpolated string we were processing</param>
         private SyntaxToken MakeInterpolatedStringTextToken(string text)
         {
             // For a normal/verbatim piece of content, process the inner content as if it was in a corresponding
             // *non*-interpolated string to get the correct meaning of all the escapes/diagnostics within.
-            var prefix = "`";
-            var fakeString = prefix + "`";
-            using var tempLexer = new Lexer(SourceText.From(fakeString), this.Options, isInterpolatedReparsing: true);
+            var fakeString = "`" + text + "`";
+            using var tempLexer = new Lexer(SourceText.From(fakeString), Options, isInterpolatedReparsing: true);
             var token = tempLexer.Lex();
             Debug.Assert(token.Kind == SyntaxKind.StringLiteralToken);
             var result = SyntaxFactory.Literal(leading: null, text, SyntaxKind.InterpolatedStringTextToken, token.ValueText!, trailing: null);
             if (token.ContainsDiagnostics)
-                result = result.WithDiagnosticsGreen(MoveDiagnostics(token.GetDiagnostics(), -prefix.Length));
+                result = result.WithDiagnosticsGreen(MoveDiagnostics(token.GetDiagnostics(), -1));
 
             return result;
         }
