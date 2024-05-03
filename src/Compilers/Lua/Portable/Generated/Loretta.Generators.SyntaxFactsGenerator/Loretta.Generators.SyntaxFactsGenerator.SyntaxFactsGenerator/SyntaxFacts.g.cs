@@ -867,6 +867,8 @@ namespace Loretta.CodeAnalysis.Lua
                 SyntaxKind.NumericLiteralToken => Loretta.CodeAnalysis.Lua.SyntaxKind.NumericalLiteralExpression,
                 SyntaxKind.StringLiteralToken => Loretta.CodeAnalysis.Lua.SyntaxKind.StringLiteralExpression,
                 SyntaxKind.HashStringLiteralToken => Loretta.CodeAnalysis.Lua.SyntaxKind.HashStringLiteralExpression,
+                SyntaxKind.InterpolatedStringToken => Loretta.CodeAnalysis.Lua.SyntaxKind.InterpolatedStringExpression,
+                SyntaxKind.InterpolatedStringTextToken => Loretta.CodeAnalysis.Lua.SyntaxKind.InterpolatedStringText,
                 _ => default,
             };
         }
@@ -1025,6 +1027,8 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.IdentifierToken:
                 case SyntaxKind.IfKeyword:
                 case SyntaxKind.InKeyword:
+                case SyntaxKind.InterpolatedStringEndToken:
+                case SyntaxKind.InterpolatedStringStartToken:
                 case SyntaxKind.InterpolatedStringTextToken:
                 case SyntaxKind.InterpolatedStringToken:
                 case SyntaxKind.LessThanEqualsToken:
@@ -1226,6 +1230,8 @@ namespace Loretta.CodeAnalysis.Lua
             {
                 case SyntaxKind.FalseKeyword:
                 case SyntaxKind.HashStringLiteralToken:
+                case SyntaxKind.InterpolatedStringTextToken:
+                case SyntaxKind.InterpolatedStringToken:
                 case SyntaxKind.NilKeyword:
                 case SyntaxKind.NumericLiteralToken:
                 case SyntaxKind.StringLiteralToken:
@@ -1249,6 +1255,8 @@ namespace Loretta.CodeAnalysis.Lua
             SyntaxKind.NumericLiteralToken,
             SyntaxKind.StringLiteralToken,
             SyntaxKind.HashStringLiteralToken,
+            SyntaxKind.InterpolatedStringToken,
+            SyntaxKind.InterpolatedStringTextToken,
         });
 
         /// <summary>

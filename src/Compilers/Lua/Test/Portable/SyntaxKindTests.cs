@@ -30,7 +30,10 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests
                 SyntaxKind.IdentifierToken,
                 SyntaxKind.HashStringLiteralToken,
                 SyntaxKind.InterpolatedStringToken,
-                SyntaxKind.InterpolatedStringTextToken
+                SyntaxKind.InterpolatedStringTextToken,
+                // these might have other text in the future:
+                SyntaxKind.InterpolatedStringStartToken,
+                SyntaxKind.InterpolatedStringEndToken,
             };
 
             foreach (var kind in kinds)

@@ -378,8 +378,10 @@ namespace Loretta.CodeAnalysis.Lua
         [Property(SyntaxKindProperty.CompoundAssignmentOperator, SlashSlashToken)]
         [Property(SyntaxKindProperty.CompoundAssignmentStatement, FloorDivideAssignmentStatement)]
         SlashSlashEqualsToken = 57,
-        
+
+        [Token]
         InterpolatedStringStartToken = 58,
+        [Token]
         InterpolatedStringEndToken = 59,
 
         // Big gap 53-500 (insert new fixed-text tokens here)
@@ -545,8 +547,12 @@ namespace Loretta.CodeAnalysis.Lua
         [Property(SyntaxKindProperty.LiteralExpression, HashStringLiteralExpression)]
         HashStringLiteralToken = 1004,
         [Token]
+        [ExtraCategories(SyntaxKindCategory.LiteralToken)]
+        [Property(SyntaxKindProperty.LiteralExpression, InterpolatedStringExpression)]
         InterpolatedStringToken = 1005,
         [Token]
+        [ExtraCategories(SyntaxKindCategory.LiteralToken)]
+        [Property(SyntaxKindProperty.LiteralExpression, InterpolatedStringText)]
         InterpolatedStringTextToken = 1006,
 
         // Big gap 1005-2000 (insert new tokens with text here)

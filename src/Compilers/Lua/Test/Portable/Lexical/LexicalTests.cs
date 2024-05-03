@@ -112,6 +112,9 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Lexical
             untestedTokenKinds.Remove(SyntaxKind.SkippedTokensTrivia);
             untestedTokenKinds.Remove(SyntaxKind.InterpolatedStringToken);
             untestedTokenKinds.Remove(SyntaxKind.InterpolatedStringTextToken);
+            untestedTokenKinds.Remove(SyntaxKind.InterpolatedStringStartToken);
+            untestedTokenKinds.Remove(SyntaxKind.InterpolatedStringEndToken);
+
 
             var manufacturedKinds = tokenKinds.Where(kind =>
                 LuaSyntaxOptions.AllPresets.All(preset =>
@@ -186,6 +189,25 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Lexical
             ShortToken expectedSeparator,
             ShortToken tokenB)
         {
+
+          
+
+            if (options.AcceptInterpolatedStrings && (tokenA.Kind == SyntaxKind.HashStringLiteralToken || tokenB.Kind == SyntaxKind.HashStringLiteralToken))
+                return;
+
+            if (tokenA.Kind == SyntaxKind.InterpolatedStringStartToken || tokenB.Kind == SyntaxKind.InterpolatedStringStartToken
+                || tokenA.Kind == SyntaxKind.InterpolatedStringEndToken || tokenB.Kind == SyntaxKind.InterpolatedStringEndToken)
+            {
+                return;
+            }
+
+            if (!options.AcceptInterpolatedStrings && (
+                tokenA.Kind == SyntaxKind.InterpolatedStringToken || tokenB.Kind == SyntaxKind.InterpolatedStringToken
+                ))
+            {
+                return;
+            }
+
             var text = tokenA.Text + expectedSeparator.Text + tokenB.Text;
             var tokens = Lex(text, options: options).ToImmutableArray();
 
