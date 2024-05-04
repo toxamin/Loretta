@@ -1087,6 +1087,14 @@ namespace Loretta.CodeAnalysis.Lua.Syntax
             return base.VisitUnaryExpression(node);
         }
 
+        public override SyntaxNode? VisitInterpolation(InterpolationSyntax node)
+        {
+            AddSpaceAfterToken(node.OpenBraceToken);
+            AddSpaceBeforeToken(node.CloseBraceToken);
+            
+            return base.VisitInterpolation(node);
+        }
+
         // Visiting VarArgExpressionSyntax is not necessary as it has no spacing.
 
         #endregion Expressions
