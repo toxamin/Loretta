@@ -320,10 +320,44 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             // Return the codepoint itself if it's in the BMP.
             // NOTE: It *is* technically incorrect to consider a surrogate
             // an Unicode codepoint but Lua accepts it so we do it as well.
-            if (codepoint <= 0xFFFF)
-                return char.ToString((char) codepoint);
-
-            return char.ConvertFromUtf32((int) codepoint);
+            
+            var builder = new StringBuilder();
+            foreach (var b in Utf8esc((uint) codepoint))
+            {
+                builder.Append((char) b);
+            }
+            return builder.ToString();
+        }
+        
+        private const int UTF8BUFFSZ = 8;
+        
+        private static int LuaO_utf8esc(byte[] buff, uint x)
+        {
+            int n = 1; // number of bytes put in buffer (backwards)
+            if (x < 0x80) // ascii?
+                buff[UTF8BUFFSZ - 1] = (byte)x;
+            else
+            { // need continuation bytes
+                uint mfb = 0x3f; // maximum that fits in first byte
+                do
+                { // add continuation bytes
+                    buff[UTF8BUFFSZ - (n++)] = (byte)(0x80 | (x & 0x3f));
+                    x >>= 6; // remove added bits
+                    mfb >>= 1; // now there is one less bit available in the first byte
+                } while (x > mfb); // still needs continuation byte?
+                buff[UTF8BUFFSZ - n] = (byte)((~mfb << 1) | x); // add first byte
+            }
+            return n;
+        }
+        
+        private static byte[] Utf8esc(uint escape)
+        {
+            var buff = new byte[UTF8BUFFSZ];
+            var bytes = new List<byte>();
+            var n = LuaO_utf8esc(buff, escape);
+            for (; n > 0; n--) // add 'buff' to string
+                bytes.Add(buff[UTF8BUFFSZ - n]);
+            return bytes.ToArray();
         }
     }
 }
