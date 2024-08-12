@@ -644,7 +644,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         {
             var returnKeyword = EatToken(SyntaxKind.ReturnKeyword);
             SeparatedSyntaxList<ExpressionSyntax> expressions = default;
-            if (CurrentToken.Kind is not (SyntaxKind.ElseKeyword or SyntaxKind.ElseIfKeyword or SyntaxKind.EndKeyword or SyntaxKind.UntilKeyword or SyntaxKind.SemicolonToken))
+            if (CurrentToken.Kind is not (SyntaxKind.ElseKeyword or SyntaxKind.ElseIfKeyword or SyntaxKind.EndKeyword or SyntaxKind.UntilKeyword or SyntaxKind.SemicolonToken or SyntaxKind.EndOfFileToken))
             {
                 var expressionsAndSeparatorsBuilder =
                     _pool.AllocateSeparated<ExpressionSyntax>();
