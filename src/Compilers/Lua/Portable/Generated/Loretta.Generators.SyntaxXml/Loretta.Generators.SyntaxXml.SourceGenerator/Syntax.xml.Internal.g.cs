@@ -8179,28 +8179,34 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
     /// <summary>This node represents a union type.</summary>
     internal sealed partial class UnionTypeSyntax : TypeSyntax
     {
-        internal readonly TypeSyntax left;
+        internal readonly TypeSyntax? left;
         internal readonly SyntaxToken pipeToken;
         internal readonly TypeSyntax right;
 
-        internal UnionTypeSyntax(SyntaxKind kind, TypeSyntax left, SyntaxToken pipeToken, TypeSyntax right, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+        internal UnionTypeSyntax(SyntaxKind kind, TypeSyntax? left, SyntaxToken pipeToken, TypeSyntax right, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
           : base(kind, diagnostics, annotations)
         {
             this.SlotCount = 3;
-            this.AdjustFlagsAndWidth(left);
-            this.left = left;
+            if (left != null)
+            {
+                this.AdjustFlagsAndWidth(left);
+                this.left = left;
+            }
             this.AdjustFlagsAndWidth(pipeToken);
             this.pipeToken = pipeToken;
             this.AdjustFlagsAndWidth(right);
             this.right = right;
         }
 
-        internal UnionTypeSyntax(SyntaxKind kind, TypeSyntax left, SyntaxToken pipeToken, TypeSyntax right)
+        internal UnionTypeSyntax(SyntaxKind kind, TypeSyntax? left, SyntaxToken pipeToken, TypeSyntax right)
           : base(kind)
         {
             this.SlotCount = 3;
-            this.AdjustFlagsAndWidth(left);
-            this.left = left;
+            if (left != null)
+            {
+                this.AdjustFlagsAndWidth(left);
+                this.left = left;
+            }
             this.AdjustFlagsAndWidth(pipeToken);
             this.pipeToken = pipeToken;
             this.AdjustFlagsAndWidth(right);
@@ -8208,7 +8214,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         }
 
         /// <summary>Gets the type on the left side of the operator.</summary>
-        public TypeSyntax Left => this.left;
+        public TypeSyntax? Left => this.left;
         /// <summary>
         /// Gets the <c>|</c> operator token.
         /// </summary>
@@ -8257,9 +8263,12 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
           : base(reader)
         {
             this.SlotCount = 3;
-            var left = (TypeSyntax)reader.ReadValue();
-            AdjustFlagsAndWidth(left);
-            this.left = left;
+            var left = (TypeSyntax?)reader.ReadValue();
+            if (left != null)
+            {
+                AdjustFlagsAndWidth(left);
+                this.left = left;
+            }
             var pipeToken = (SyntaxToken)reader.ReadValue();
             AdjustFlagsAndWidth(pipeToken);
             this.pipeToken = pipeToken;
@@ -8285,28 +8294,34 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
     /// <summary>This node represents an intersection type.</summary>
     internal sealed partial class IntersectionTypeSyntax : TypeSyntax
     {
-        internal readonly TypeSyntax left;
+        internal readonly TypeSyntax? left;
         internal readonly SyntaxToken ampersandToken;
         internal readonly TypeSyntax right;
 
-        internal IntersectionTypeSyntax(SyntaxKind kind, TypeSyntax left, SyntaxToken ampersandToken, TypeSyntax right, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
+        internal IntersectionTypeSyntax(SyntaxKind kind, TypeSyntax? left, SyntaxToken ampersandToken, TypeSyntax right, DiagnosticInfo[]? diagnostics, SyntaxAnnotation[]? annotations)
           : base(kind, diagnostics, annotations)
         {
             this.SlotCount = 3;
-            this.AdjustFlagsAndWidth(left);
-            this.left = left;
+            if (left != null)
+            {
+                this.AdjustFlagsAndWidth(left);
+                this.left = left;
+            }
             this.AdjustFlagsAndWidth(ampersandToken);
             this.ampersandToken = ampersandToken;
             this.AdjustFlagsAndWidth(right);
             this.right = right;
         }
 
-        internal IntersectionTypeSyntax(SyntaxKind kind, TypeSyntax left, SyntaxToken ampersandToken, TypeSyntax right)
+        internal IntersectionTypeSyntax(SyntaxKind kind, TypeSyntax? left, SyntaxToken ampersandToken, TypeSyntax right)
           : base(kind)
         {
             this.SlotCount = 3;
-            this.AdjustFlagsAndWidth(left);
-            this.left = left;
+            if (left != null)
+            {
+                this.AdjustFlagsAndWidth(left);
+                this.left = left;
+            }
             this.AdjustFlagsAndWidth(ampersandToken);
             this.ampersandToken = ampersandToken;
             this.AdjustFlagsAndWidth(right);
@@ -8314,7 +8329,7 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
         }
 
         /// <summary>Gets the type on the left side of the operator.</summary>
-        public TypeSyntax Left => this.left;
+        public TypeSyntax? Left => this.left;
         /// <summary>
         /// Gets the <c>&amp;</c> operator token.
         /// </summary>
@@ -8363,9 +8378,12 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
           : base(reader)
         {
             this.SlotCount = 3;
-            var left = (TypeSyntax)reader.ReadValue();
-            AdjustFlagsAndWidth(left);
-            this.left = left;
+            var left = (TypeSyntax?)reader.ReadValue();
+            if (left != null)
+            {
+                AdjustFlagsAndWidth(left);
+                this.left = left;
+            }
             var ampersandToken = (SyntaxToken)reader.ReadValue();
             AdjustFlagsAndWidth(ampersandToken);
             this.ampersandToken = ampersandToken;
@@ -11413,10 +11431,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             return result;
         }
 
-        public static UnionTypeSyntax UnionType(TypeSyntax left, SyntaxToken pipeToken, TypeSyntax right)
+        public static UnionTypeSyntax UnionType(TypeSyntax? left, SyntaxToken pipeToken, TypeSyntax right)
         {
 #if DEBUG
-            if (left == null) throw new ArgumentNullException(nameof(left));
             if (pipeToken == null) throw new ArgumentNullException(nameof(pipeToken));
             if (pipeToken.Kind != SyntaxKind.PipeToken) throw new ArgumentException($"Invalid kind provided. Expected PipeToken but got {pipeToken.Kind}.", nameof(pipeToken));
             if (right == null) throw new ArgumentNullException(nameof(right));
@@ -11435,10 +11452,9 @@ namespace Loretta.CodeAnalysis.Lua.Syntax.InternalSyntax
             return result;
         }
 
-        public static IntersectionTypeSyntax IntersectionType(TypeSyntax left, SyntaxToken ampersandToken, TypeSyntax right)
+        public static IntersectionTypeSyntax IntersectionType(TypeSyntax? left, SyntaxToken ampersandToken, TypeSyntax right)
         {
 #if DEBUG
-            if (left == null) throw new ArgumentNullException(nameof(left));
             if (ampersandToken == null) throw new ArgumentNullException(nameof(ampersandToken));
             if (ampersandToken.Kind != SyntaxKind.AmpersandToken) throw new ArgumentException($"Invalid kind provided. Expected AmpersandToken but got {ampersandToken.Kind}.", nameof(ampersandToken));
             if (right == null) throw new ArgumentNullException(nameof(right));

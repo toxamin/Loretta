@@ -296,7 +296,7 @@ namespace Loretta.CodeAnalysis.Lua.UnitTests.Lexical
 
             if (options.AcceptUnicodeEscape || !options.AcceptInvalidEscapes)
             {
-                shortStringContentValue = shortStringContentValue.Replace("u{D800}u{10FFFF}", "\uD800\U0010FFFF");
+                shortStringContentValue = shortStringContentValue.Replace("u{D800}u{10FFFF}", "\xED\xA0\x80\xF4\x8F\xBF\xBF");
             }
 
             if (options.AcceptWhitespaceEscape || !options.AcceptInvalidEscapes)
