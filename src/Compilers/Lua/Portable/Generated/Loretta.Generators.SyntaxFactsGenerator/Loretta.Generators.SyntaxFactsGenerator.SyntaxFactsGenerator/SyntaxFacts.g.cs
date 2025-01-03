@@ -233,13 +233,13 @@ namespace Loretta.CodeAnalysis.Lua
                             __candidate__0 = "then";
                             __destination__0 = 20;
                             break;
-                        case 'r':
-                            __candidate__0 = "true";
-                            __destination__0 = 21;
-                            break;
                         case 'y':
                             __candidate__0 = "type";
-                            __destination__0 = 22;
+                            __destination__0 = 21;
+                            break;
+                        case 'r':
+                            __candidate__0 = "true";
+                            __destination__0 = 23;
                             break;
                     }
                     break;
@@ -289,7 +289,7 @@ namespace Loretta.CodeAnalysis.Lua
                             break;
                         case 0x00700079:
                             __candidate__0 = "typeof";
-                            __destination__0 = 23;
+                            __destination__0 = 22;
                             break;
                     }
                     break;
@@ -397,15 +397,15 @@ namespace Loretta.CodeAnalysis.Lua
                     }
                     case 21:
                     {
-                        return SyntaxKind.TrueKeyword;
+                        return SyntaxKind.TypeKeyword;
                     }
                     case 22:
                     {
-                        return SyntaxKind.TypeKeyword;
+                        return SyntaxKind.TypeofKeyword;
                     }
                     case 23:
                     {
-                        return SyntaxKind.TypeofKeyword;
+                        return SyntaxKind.TrueKeyword;
                     }
                     case 24:
                     {
@@ -496,13 +496,13 @@ namespace Loretta.CodeAnalysis.Lua
                             __candidate__0 = "then";
                             __destination__0 = 20;
                             break;
-                        case 'r':
-                            __candidate__0 = "true";
-                            __destination__0 = 21;
-                            break;
                         case 'y':
                             __candidate__0 = "type";
-                            __destination__0 = 22;
+                            __destination__0 = 21;
+                            break;
+                        case 'r':
+                            __candidate__0 = "true";
+                            __destination__0 = 23;
                             break;
                     }
                     break;
@@ -552,7 +552,7 @@ namespace Loretta.CodeAnalysis.Lua
                             break;
                         case 0x00700079:
                             __candidate__0 = "typeof";
-                            __destination__0 = 23;
+                            __destination__0 = 22;
                             break;
                     }
                     break;
@@ -660,15 +660,15 @@ namespace Loretta.CodeAnalysis.Lua
                     }
                     case 21:
                     {
-                        return SyntaxKind.TrueKeyword;
+                        return SyntaxKind.TypeKeyword;
                     }
                     case 22:
                     {
-                        return SyntaxKind.TypeKeyword;
+                        return SyntaxKind.TypeofKeyword;
                     }
                     case 23:
                     {
-                        return SyntaxKind.TypeofKeyword;
+                        return SyntaxKind.TrueKeyword;
                     }
                     case 24:
                     {
@@ -815,9 +815,9 @@ namespace Loretta.CodeAnalysis.Lua
                 SyntaxKind.RepeatKeyword => "repeat",
                 SyntaxKind.ReturnKeyword => "return",
                 SyntaxKind.ThenKeyword => "then",
-                SyntaxKind.TrueKeyword => "true",
                 SyntaxKind.TypeKeyword => "type",
                 SyntaxKind.TypeofKeyword => "typeof",
+                SyntaxKind.TrueKeyword => "true",
                 SyntaxKind.UntilKeyword => "until",
                 SyntaxKind.WhileKeyword => "while",
 
@@ -966,9 +966,9 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.RepeatKeyword:
                 case SyntaxKind.ReturnKeyword:
                 case SyntaxKind.ThenKeyword:
-                case SyntaxKind.TrueKeyword:
                 case SyntaxKind.TypeKeyword:
                 case SyntaxKind.TypeofKeyword:
+                case SyntaxKind.TrueKeyword:
                 case SyntaxKind.UntilKeyword:
                 case SyntaxKind.WhileKeyword:
                     return true;
@@ -1065,9 +1065,9 @@ namespace Loretta.CodeAnalysis.Lua
                 case SyntaxKind.ThenKeyword:
                 case SyntaxKind.TildeEqualsToken:
                 case SyntaxKind.TildeToken:
-                case SyntaxKind.TrueKeyword:
                 case SyntaxKind.TypeKeyword:
                 case SyntaxKind.TypeofKeyword:
+                case SyntaxKind.TrueKeyword:
                 case SyntaxKind.UntilKeyword:
                 case SyntaxKind.WhileKeyword:
                     return true;

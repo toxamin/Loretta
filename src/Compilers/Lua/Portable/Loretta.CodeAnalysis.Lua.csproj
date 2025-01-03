@@ -51,6 +51,9 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>LuaResources.resx</DependentUpon>
         </Compile>
+        <Compile Include="Generated\Loretta.Generators.SyntaxXml\Loretta.Generators.SyntaxXml.SourceGenerator\Syntax.xml.Internal.g.cs" />
+        <Compile Include="Generated\Loretta.Generators.SyntaxXml\Loretta.Generators.SyntaxXml.SourceGenerator\Syntax.xml.Main.g.cs" />
+        <Compile Include="Generated\Loretta.Generators.SyntaxXml\Loretta.Generators.SyntaxXml.SourceGenerator\Syntax.xml.Syntax.g.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,7 +65,6 @@
 
 
     <ItemGroup Condition="'$(DocGen)' != 'true'">
-        <Folder Include="Generated\" />
 
         <AdditionalFiles Include="Syntax\Syntax.xml" />
         <None Include="Syntax\Syntax.xsd" />
